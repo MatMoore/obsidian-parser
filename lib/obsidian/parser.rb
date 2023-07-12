@@ -5,14 +5,15 @@ require_relative "parser/version"
 module Obsidian
   class Error < StandardError; end
 
+  def self.build_slug(title, parent_slug)
+    (parent_slug == "") ? title : "#{parent_slug}/#{title}"
+  end
+
   class Note
-    def initialize(path, last_modified)
+    def initialize(title, slug, last_modified)
       # TODO: check frontmatter for titles as well
-      @title = path.basename.to_s.gsub(/\.md\z/, "")
-      @parent = path.dirname
-
-      @slug = path.to_s.gsub(/\.md\z/, "")
-
+      @title = title
+      @slug = slug
       @last_modified = last_modified
     end
 
@@ -22,7 +23,6 @@ module Obsidian
 
     attr_reader :title
     attr_reader :slug
-    attr_reader :parent
     attr_reader :last_modified
   end
 
@@ -35,19 +35,15 @@ module Obsidian
     end
 
     def add_directory(title)
-      new_slug = if slug == ""
-        title
-      else
-        [slug, title].join("/")
-      end
-
+      new_slug = Obsidian.build_slug(title, slug)
       @directories[title] ||= Index.new(title, new_slug)
     end
 
     def add_note(title, parent_slug, last_modified)
-      note = Note.new(parent_slug + title, last_modified)
+      slug = Obsidian.build_slug(title, parent_slug)
+      directory = nested_directory(parent_slug.split("/"))
+      note = Note.new(title, slug, last_modified)
 
-      directory = nested_directory(parent_slug.to_s.split("/").reject { |c| c == "." })
       directory.notes << note
     end
 
@@ -80,11 +76,9 @@ module Obsidian
         dirname, basename = path.relative_path_from(vault_directory).split
 
         if basename != "index.md" && basename != "."
-          if dirname == "."
-            dirname = ""
-          end
-
-          @index.add_note(basename, dirname, path.mtime)
+          title = basename.to_s.gsub(/\.md\z/, "")
+          parent_slug = dirname.to_s.gsub(/\A\.\/?/, "")
+          @index.add_note(title, parent_slug, path.mtime)
         end
       end
 
