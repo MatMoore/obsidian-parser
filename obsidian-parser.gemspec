@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Mat Moore"]
   spec.email = ["matmoore@users.noreply.github.com"]
 
-  spec.summary = "Parse notes created with ObsidianMD."
+  spec.summary = "Parse notes created with the Obsidian note-taking tool."
   #spec.description = "TODO: Write a longer description or delete this line."
 
   spec.license = "MIT"
