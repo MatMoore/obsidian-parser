@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     obsidian-parser (0.1.0)
+      kramdown (~> 2.4)
+      kramdown-parser-gfm (~> 1.1)
 
 GEM
   remote: https://rubygems.org/
@@ -9,6 +11,10 @@ GEM
     ast (2.4.2)
     diff-lcs (1.5.0)
     json (2.6.3)
+    kramdown (2.4.0)
+      rexml
+    kramdown-parser-gfm (1.1.0)
+      kramdown (~> 2.0)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
     parallel (1.23.0)
