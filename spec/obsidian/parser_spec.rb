@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Obsidian::Parser do
-  EXAMPLE_VAULT = Pathname.new(__dir__).join('../example_vault')
+  let(:vault) { Pathname.new(__dir__).join('../example_vault') }
 
-  subject(:parser) { described_class.new(EXAMPLE_VAULT) }
+  subject(:parser) { described_class.new(vault) }
 
   it "has a version number" do
     expect(Obsidian::Parser::VERSION).not_to be nil
@@ -22,7 +22,23 @@ RSpec.describe Obsidian::Parser do
     )
   end
 
+  it "assigns titles and slugs to nested directories" do
+    expect(parser.index.directories).to include(
+      an_object_having_attributes(title: 'animals', slug: 'animals')
+    )
+  end
+
   it "gives notes a last modified time" do
-    expect(parser.notes.first.last_modified).to be_an_instance_of(Time)
+    expect(parser.notes.find {|note| note.title == 'cat'}.last_modified).to be_an_instance_of(Time)
+  end
+
+  it "generates a table of contents" do
+    expect(parser.table_of_contents).to contain_exactly(
+      [an_object_having_attributes(title: 'animals', slug: 'animals'), 0],
+      [an_object_having_attributes(title: 'cat', slug: 'animals/cat'), 1],
+      [an_object_having_attributes(title: 'dog', slug: 'animals/dog'), 1],
+      [an_object_having_attributes(title: 'red panda', slug: 'animals/red panda'), 1],
+      [an_object_having_attributes(title: 'some links', slug: 'some links'), 0],
+    )
   end
 end
