@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["matmoore@users.noreply.github.com"]
 
   spec.summary = "Parse notes created with the Obsidian note-taking tool."
-  #spec.description = "TODO: Write a longer description or delete this line."
+  # spec.description = "TODO: Write a longer description or delete this line."
 
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
@@ -31,8 +31,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency 'kramdown', '~> 2.4'
-  spec.add_dependency 'kramdown-parser-gfm', '~> 1.1'
+  spec.add_dependency "kramdown", "~> 2.4"
+  spec.add_dependency "kramdown-parser-gfm", "~> 1.1"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
