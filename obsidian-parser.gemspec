@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
+  # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
   spec.metadata["source_code_uri"] = "https://github.com/matmoore/obsidian-parser"
   spec.metadata["changelog_uri"] = "https://github.com/matmoore/obsidian-parser/tree/main/CHANGELOG.md"
