@@ -1,0 +1,20 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: local
+    hooks:
+    -   id: standardrb
+        name: bundle exec rake standard:fix
+        entry: bundle exec rake standard:fix
+        language: system
+        pass_filenames: false
+-   repo: local
+    hooks:
+    -   id: rspec
+        name: bundle exec rspec
+        entry: bundle exec rspec
+        language: system
+        pass_filenames: false
