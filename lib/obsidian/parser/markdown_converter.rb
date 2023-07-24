@@ -10,6 +10,10 @@ module Obsidian
       _extract_links(document.root)
     end
 
+    def to_html
+      document.to_html
+    end
+
     private
 
     attr_reader :document

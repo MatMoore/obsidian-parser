@@ -41,4 +41,8 @@ RSpec.describe Obsidian::Parser do
       [an_object_having_attributes(title: "some links", slug: "some links"), 0]
     )
   end
+
+  it "converts markdown into HTML content" do
+    expect(parser.notes.find { |note| note.title == "cat" }.content.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n\n<p>Meow meow meow</p>\n")
+  end
 end
