@@ -45,4 +45,20 @@ RSpec.describe Obsidian::Parser do
   it "converts markdown into HTML content" do
     expect(parser.notes.find { |note| note.title == "cat" }.content.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n\n<p>Meow meow meow</p>\n")
   end
+
+  describe(Obsidian::Note) do
+    it "links to its parent" do
+      index = Obsidian::Index.new("", "")
+      note = index.add_note("slug", "grandparent/parent", Time.now, content: "")
+
+      expect(note.parent.slug).to eq("grandparent/parent")
+    end
+
+    it "links to the root if there is no parent" do
+      index = Obsidian::Index.new("", "")
+      note = index.add_note("slug", "", Time.now, content: "")
+
+      expect(note.parent.slug).to eq("")
+    end
+  end
 end

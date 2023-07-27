@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.3.0] - 2023-07-27
+
+- Note objects have a `parent` attribute.
+
 ## [0.2.0] - 2023-07-24
 
 - Note objects have a `content` attribute. Call `content.generate_html` to generate HTML on demand.

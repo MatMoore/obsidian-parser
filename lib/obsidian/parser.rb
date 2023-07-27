@@ -23,12 +23,13 @@ module Obsidian
   end
 
   class Note
-    def initialize(title, slug, last_modified, content: nil)
+    def initialize(title, slug, last_modified, content: nil, parent: nil)
       # TODO: check frontmatter for titles as well
       @title = title
       @slug = slug
       @last_modified = last_modified
       @content = content
+      @parent = parent
     end
 
     def inspect
@@ -39,6 +40,7 @@ module Obsidian
     attr_reader :slug
     attr_reader :last_modified
     attr_reader :content
+    attr_reader :parent
   end
 
   class Index
@@ -58,9 +60,11 @@ module Obsidian
     def add_note(title, parent_slug, last_modified, content: nil)
       slug = Obsidian.build_slug(title, parent_slug)
       directory = nested_directory(parent_slug.split("/"))
-      note = Note.new(title, slug, last_modified, content: content)
+      note = Note.new(title, slug, last_modified, content: content, parent: directory)
 
       directory.notes << note
+
+      note
     end
 
     def inspect
