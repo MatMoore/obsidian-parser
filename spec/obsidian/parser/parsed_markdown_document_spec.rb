@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Obsidian::MarkdownConverter do
+RSpec.describe Obsidian::ParsedMarkdownDocument do
   it "extracts [foo](bar) links" do
     markdown = "here is a link: [foo](bar)"
 

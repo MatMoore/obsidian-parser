@@ -34,7 +34,7 @@ module Obsidian
     # Parse links from obsidian-flavored-markdown text
     def self.parse(markdown_text)
       document = Kramdown::Document.new(normalize(markdown_text), input: "GFM")
-      Obsidian::MarkdownConverter.new(document)
+      Obsidian::ParsedMarkdownDocument.new(document)
     end
   end
 end

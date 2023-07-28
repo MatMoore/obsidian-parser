@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Obsidian
-  class MarkdownConverter
+  class ParsedMarkdownDocument
     def initialize(document)
       @document = document
     end

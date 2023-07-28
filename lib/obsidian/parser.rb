@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "parser/version"
-require_relative "parser/markdown_converter"
+require_relative "parser/parsed_markdown_document"
 require_relative "parser/obsidian_flavored_markdown"
 
 module Obsidian
