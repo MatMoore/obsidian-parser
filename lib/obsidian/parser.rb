@@ -3,6 +3,7 @@
 require_relative "parser/version"
 require_relative "parser/parsed_markdown_document"
 require_relative "parser/obsidian_flavored_markdown"
+require_relative "parser/page"
 
 module Obsidian
   class Error < StandardError; end

@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 - Rename `Obsidian::MarkdownConverter` to `Obsidian::ParsedMarkdownDocument`
+- Unify `Note` and `Index` classes into `Page`. This is a breaking API change.
 
 ## [0.3.0] - 2023-07-27
 
