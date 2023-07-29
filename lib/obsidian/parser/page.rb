@@ -80,6 +80,13 @@ module Obsidian
       @children.values.sort_by { |c| [c.is_index? ? 1 : 0, c.title] }
     end
 
+    def walk_tree(&block)
+      children.each do |page|
+        block.call(page)
+        page.walk_tree(&block)
+      end
+    end
+
     attr_reader :title
     attr_reader :slug
     attr_reader :last_modified

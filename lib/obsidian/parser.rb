@@ -56,15 +56,8 @@ module Obsidian
 
     def pages
       result = []
-      walk_tree(index) { |page, level| result << page }
+      index.walk_tree { |page| result << page }
       result
-    end
-
-    def walk_tree(index, level = 0, &block)
-      index.children.each do |page|
-        block.call(page, level)
-        walk_tree(page, level + 1, &block)
-      end
     end
   end
 end
