@@ -30,7 +30,9 @@ module Obsidian
     end
 
     def ==(other)
-      !slug.nil? && slug == other.slug
+      self.class == other.class &&
+        !slug.nil? &&
+        slug == other&.slug
     end
 
     alias_method :eql?, :==
