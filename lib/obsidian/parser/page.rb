@@ -87,6 +87,34 @@ module Obsidian
       end
     end
 
+    # Return the page that matches a slug.
+    # If there is an exact match, we should always return that
+    # Otherwise, if we can skip over some anscestors and get a
+    # match, then return the first, shortest match.
+    def find_in_tree(query_slug)
+      # Exact match
+      return self if slug == query_slug
+
+      # Partial match
+      query_parts = query_slug.split("/")
+      length = query_parts.size
+      slug_parts = slug.split("/")
+
+      if slug_parts.length > length
+        if slug_parts.slice(-length, length) == query_parts
+          return self
+        end
+      end
+
+      # Recurse
+      children.each do |child|
+        result = child.find_in_tree(query_slug)
+        return result unless result.nil?
+      end
+
+      nil
+    end
+
     attr_reader :title
     attr_reader :slug
     attr_reader :last_modified

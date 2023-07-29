@@ -4,7 +4,7 @@ RSpec.describe Obsidian::Page do
   subject(:root) { described_class.create_root }
 
   describe("#add_page") do
-    it "relates too pages" do
+    it "relates two pages" do
       page = root.add_page("foo")
 
       expect(page.parent).to eq(root)
@@ -35,6 +35,41 @@ RSpec.describe Obsidian::Page do
       expect(parent.children).to eq([page])
       expect(grandparent.children).to eq([parent])
       expect(root.children).to eq([grandparent])
+    end
+  end
+
+  describe "#find_in_tree" do
+    it "finds exact title matches" do
+      page = root.add_page("foo/bar/baz")
+      root.add_page("baz")
+
+      expect(root.find_in_tree("foo/bar/baz")).to eq(page)
+      expect(root.find_in_tree("foo/bar")).to eq(page.parent)
+    end
+
+    it "returns nil if there is no match" do
+      root.add_page("foo/bar")
+
+      expect(root.find_in_tree("foo/bar/baz")).to be_nil
+    end
+
+    it "returns a partial match" do
+      page = root.add_page("foo/bar/baz")
+
+      expect(root.find_in_tree("bar/baz")).to eq(page)
+    end
+
+    it "doesn't match if a path component is incomplete" do
+      root.add_page("foo/bar/baz")
+
+      expect(root.find_in_tree("ar/baz")).to be_nil
+    end
+
+    it "returns the page with the shortest slug if there are multiple partial matches" do
+      page = root.add_page("bar/baz")
+      root.add_page("foo/bar/baz")
+
+      expect(root.find_in_tree("bar/baz")).to eq(page)
     end
   end
 end

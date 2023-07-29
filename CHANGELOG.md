@@ -3,6 +3,7 @@
 - Rename `Obsidian::MarkdownConverter` to `Obsidian::ParsedMarkdownDocument`
 - Unify `Note` and `Index` classes into `Page`. This is a breaking API change. `Parser#notes is replaced by Parse#pages`. Call `Page#is_index?`to distinguish between directory derived pages and documents.
 - Remove `Parser#table_of_contents` and `Parser#walk_tree`.
+- Add `Page#find_in_tree` to recursively search for a tree with the desired slug.
 
 ## [0.3.0] - 2023-07-27
 
