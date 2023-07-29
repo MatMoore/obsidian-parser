@@ -66,11 +66,5 @@ module Obsidian
         walk_tree(page, level + 1, &block)
       end
     end
-
-    def table_of_contents
-      result = []
-      walk_tree(index) { |note, level| result << [note, level] }
-      result
-    end
   end
 end

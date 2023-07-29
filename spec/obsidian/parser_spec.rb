@@ -32,16 +32,6 @@ RSpec.describe Obsidian::Parser do
     expect(parser.pages.find { |note| note.title == "cat" }.last_modified).to be_an_instance_of(Time)
   end
 
-  it "generates a table of contents" do
-    expect(parser.table_of_contents).to contain_exactly(
-      [an_object_having_attributes(title: "animals", slug: "animals"), 0],
-      [an_object_having_attributes(title: "cat", slug: "animals/cat"), 1],
-      [an_object_having_attributes(title: "dog", slug: "animals/dog"), 1],
-      [an_object_having_attributes(title: "red panda", slug: "animals/red panda"), 1],
-      [an_object_having_attributes(title: "some links", slug: "some links"), 0]
-    )
-  end
-
   it "converts markdown into HTML content" do
     expect(parser.pages.find { |note| note.title == "cat" }.content.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n\n<p>Meow meow meow</p>\n")
   end
