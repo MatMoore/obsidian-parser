@@ -10,26 +10,26 @@ RSpec.describe Obsidian::Parser do
   end
 
   it "assigns titles and slugs to top level notes" do
-    expect(parser.notes).to include(
+    expect(parser.pages).to include(
       an_object_having_attributes(title: "some links", slug: "some links")
     )
   end
 
   it "assigns titles and slugs to nested notes" do
-    expect(parser.notes).to include(
+    expect(parser.pages).to include(
       an_object_having_attributes(title: "cat", slug: "animals/cat"),
       an_object_having_attributes(title: "dog", slug: "animals/dog")
     )
   end
 
   it "assigns titles and slugs to nested directories" do
-    expect(parser.index.directories).to include(
+    expect(parser.index.children).to include(
       an_object_having_attributes(title: "animals", slug: "animals")
     )
   end
 
   it "gives notes a last modified time" do
-    expect(parser.notes.find { |note| note.title == "cat" }.last_modified).to be_an_instance_of(Time)
+    expect(parser.pages.find { |note| note.title == "cat" }.last_modified).to be_an_instance_of(Time)
   end
 
   it "generates a table of contents" do
@@ -43,21 +43,6 @@ RSpec.describe Obsidian::Parser do
   end
 
   it "converts markdown into HTML content" do
-    expect(parser.notes.find { |note| note.title == "cat" }.content.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n\n<p>Meow meow meow</p>\n")
-  end
-
-  describe(Obsidian::Note) do
-    let(:index) { Obsidian::Index.new(Obsidian::Page.create_root) }
-    it "links to its parent" do
-      note = index.add_note("slug", "grandparent/parent", Time.now, content: "")
-
-      expect(note.parent.slug).to eq("grandparent/parent")
-    end
-
-    it "links to the root if there is no parent" do
-      note = index.add_note("slug", "", Time.now, content: "")
-
-      expect(note.parent.slug).to eq("")
-    end
+    expect(parser.pages.find { |note| note.title == "cat" }.content.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n\n<p>Meow meow meow</p>\n")
   end
 end
