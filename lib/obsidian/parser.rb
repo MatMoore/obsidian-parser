@@ -5,6 +5,8 @@ require_relative "parser/parsed_markdown_document"
 require_relative "parser/obsidian_flavored_markdown"
 require_relative "parser/page"
 
+require "forwardable"
+
 module Obsidian
   class Error < StandardError; end
 
@@ -24,67 +26,54 @@ module Obsidian
   end
 
   class Note
-    def initialize(title, slug, last_modified, content: nil, parent: nil)
-      # TODO: check frontmatter for titles as well
-      @title = title
-      @slug = slug
-      @last_modified = last_modified
-      @content = content
-      @parent = parent
+    extend Forwardable
+
+    def_delegators :@page, :title, :slug, :last_modified, :content
+
+    def initialize(page)
+      @page = page
     end
 
     def inspect
-      "Note(title: #{title.inspect}, slug: #{slug.inspect})"
+      "Note(title: #{@page.title.inspect}, slug: #{@page.slug.inspect})"
     end
 
-    attr_reader :title
-    attr_reader :slug
-    attr_reader :last_modified
-    attr_reader :content
-    attr_reader :parent
+    def parent
+      @page.parent.is_index? ? Index.new(@page.parent) : Note.new(@page.parent)
+    end
   end
 
   class Index
-    def initialize(title = "", slug = "", content: nil)
-      @title = title
-      @slug = slug
-      @notes = []
-      @directories = {}
-      @content = content
+    extend Forwardable
+
+    def_delegators :@page, :title, :slug, :last_modified, :content
+
+    def initialize(page)
+      @page = page
     end
 
     def add_directory(title)
       new_slug = Obsidian.build_slug(title, slug)
-      @directories[title] ||= Index.new(title, new_slug)
+      directory = @page.get_or_create_child(title: title, slug: new_slug)
+      Index.new(directory)
     end
 
     def add_note(title, parent_slug, last_modified, content: nil)
       slug = Obsidian.build_slug(title, parent_slug)
-      directory = nested_directory(parent_slug.split("/"))
-      note = Note.new(title, slug, last_modified, content: content, parent: directory)
-
-      directory.notes << note
-
-      note
+      note = @page.add_page(slug, last_modified: last_modified, content: content)
+      Note.new(note)
     end
 
     def inspect
-      "Index(title: #{title.inspect}, slug: #{slug.inspect})"
+      "Index(title: #{@page.title.inspect}, slug: #{@page.slug.inspect})"
     end
 
     def directories
-      @directories.values
+      @page.children.filter(&:is_index?).map { |d| Index.new(d) }
     end
 
-    attr_reader :notes
-    attr_reader :title
-    attr_reader :slug
-    attr_reader :content
-
-    private
-
-    def nested_directory(path_components)
-      path_components.reduce(self) { |index, subdirectory| index.add_directory(subdirectory) }
+    def notes
+      @page.children.reject(&:is_index?).map { |n| Note.new(n) }
     end
   end
 
@@ -92,7 +81,7 @@ module Obsidian
     attr_reader :index
 
     def initialize(vault_directory)
-      @index = Index.new("", "")
+      @index = Index.new(Obsidian::Page.create_root)
 
       vault_directory.glob("**/*.md").each do |path|
         dirname, basename = path.relative_path_from(vault_directory).split
