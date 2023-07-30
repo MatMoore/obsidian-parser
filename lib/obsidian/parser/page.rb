@@ -77,7 +77,7 @@ module Obsidian
     end
 
     def children
-      @children.values.sort_by { |c| [c.is_index? ? 1 : 0, c.title] }
+      @children.values.sort_by { |c| [c.is_index? ? 0 : 1, c.title] }
     end
 
     def walk_tree(&block)

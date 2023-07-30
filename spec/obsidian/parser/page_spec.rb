@@ -3,6 +3,18 @@
 RSpec.describe Obsidian::Page do
   subject(:root) { described_class.create_root }
 
+  describe("#children") do
+    it "orders pages with children ahead of regular pages" do
+      a = root.add_page("a")
+      b = root.add_page("b")
+      c = root.add_page("c")
+      d = root.add_page("d/e").parent
+      root.add_page("b/f")
+
+      expect(root.children).to eq([b, d, a, c])
+    end
+  end
+
   describe("#add_page") do
     it "relates two pages" do
       page = root.add_page("foo")

@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Fix ordering of `Page#children` so that index pages come first.
 
 ## [0.4.0] - 2023-07-30
 - Unify `Note` and `Index` classes into `Page`. This is a breaking API change. `Parser#notes is replaced by Parse#pages`. Call `Page#is_index?`to distinguish between directory derived pages and documents.
