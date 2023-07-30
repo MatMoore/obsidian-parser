@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    obsidian-parser (0.3.0)
+    obsidian-parser (0.4.0)
       kramdown (~> 2.4)
       kramdown-parser-gfm (~> 1.1)
 
