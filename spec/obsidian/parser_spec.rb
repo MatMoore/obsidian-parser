@@ -42,4 +42,10 @@ RSpec.describe Obsidian::Parser do
     expect(animals.children.map(&:title)).not_to include("index")
     expect(animals.content&.generate_html).to eq("<p>Animals page</p>\n")
   end
+
+  it "adds index.md content to the root" do
+    content = parser.index.content
+
+    expect(content&.generate_html).to eq("<p>Blahhhh</p>\n")
+  end
 end

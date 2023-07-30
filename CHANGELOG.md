@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.5.1] - 2023-07-30
+- Fix handling of `index.md` at the root level.
+
 ## [0.5.0] - 2023-07-30
 - Fix ordering of `Page#children` so that index pages come first.
 - Fix handling of `index.md` documents so that the slug reflects the directory path.

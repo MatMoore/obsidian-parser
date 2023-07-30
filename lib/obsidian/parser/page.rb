@@ -47,7 +47,11 @@ module Obsidian
     # are added before their descendents.
     def add_page(slug, last_modified: nil, content: nil)
       path_components = slug.split("/")
-      raise ArgumentError, "Expecting non-empty slug" if path_components.empty?
+
+      if path_components.empty?
+        update_content(content: content, last_modified: last_modified)
+        return
+      end
 
       title = path_components.pop
 
