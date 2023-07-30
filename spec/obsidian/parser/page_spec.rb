@@ -71,5 +71,12 @@ RSpec.describe Obsidian::Page do
 
       expect(root.find_in_tree("bar/baz")).to eq(page)
     end
+
+    it "returns the first match if there are multiple partial matches at the same level" do
+      page = root.add_page("aa/bar/baz")
+      root.add_page("foo/bar/baz")
+
+      expect(root.find_in_tree("aa/bar/baz")).to eq(page)
+    end
   end
 end
