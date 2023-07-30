@@ -36,19 +36,21 @@ module Obsidian
 
         next if basename == "."
 
-        # TODO: handle index.md files
-        if basename != "index.md"
-          title = basename.to_s.gsub(/\.md\z/, "")
-          parent_slug = dirname.to_s.gsub(/\A\.\/?/, "")
-          slug = Obsidian.build_slug(title, parent_slug)
-          content = MarkdownContent.new(path)
+        # Remove the path component "." from the start of the dirname
+        parent_slug = dirname.to_s.gsub(/\A\.\/?/, "")
 
-          @index.add_page(
-            slug,
-            last_modified: path.mtime,
-            content: content
-          )
+        if basename.to_s == "index.md"
+          slug = parent_slug.to_s.gsub(/\.md\z/, "")
+        else
+          title = basename.to_s.gsub(/\.md\z/, "")
+          slug = Obsidian.build_slug(title, parent_slug)
         end
+
+        @index.add_page(
+          slug,
+          last_modified: path.mtime,
+          content: MarkdownContent.new(path)
+        )
       end
 
       # TODO: capture links between notes

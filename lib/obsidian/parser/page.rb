@@ -61,7 +61,9 @@ module Obsidian
         slug: slug,
         last_modified: last_modified,
         content: content
-      )
+      ).tap do |page|
+        page.update_content(content: content, last_modified: last_modified)
+      end
     end
 
     def get_or_create_child(title:, slug:, last_modified: nil, content: nil)
@@ -74,6 +76,11 @@ module Obsidian
         content: content,
         parent: self
       )
+    end
+
+    def update_content(content:, last_modified:)
+      @content ||= content
+      @last_modified ||= last_modified
     end
 
     def children

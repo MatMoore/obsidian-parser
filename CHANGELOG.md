@@ -1,5 +1,8 @@
 ## [Unreleased]
+
+## [0.5.0] - 2023-07-30
 - Fix ordering of `Page#children` so that index pages come first.
+- Fix handling of `index.md` documents so that the slug reflects the directory path.
 
 ## [0.4.0] - 2023-07-30
 - Unify `Note` and `Index` classes into `Page`. This is a breaking API change. `Parser#notes is replaced by Parse#pages`. Call `Page#is_index?`to distinguish between directory derived pages and documents.
