@@ -9,6 +9,12 @@ RSpec.describe Obsidian::Parser do
     expect(Obsidian::Parser::VERSION).not_to be nil
   end
 
+  it "includes a root page" do
+    expect(parser.pages).to include(
+      an_object_having_attributes(title: "", slug: "")
+    )
+  end
+
   it "assigns titles and slugs to top level notes" do
     expect(parser.pages).to include(
       an_object_having_attributes(title: "some links", slug: "some links")

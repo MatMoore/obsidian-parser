@@ -92,8 +92,9 @@ module Obsidian
     end
 
     def walk_tree(&block)
+      block.call(self)
+
       children.each do |page|
-        block.call(page)
         page.walk_tree(&block)
       end
     end

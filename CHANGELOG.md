@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-## [0.5.1] - 2023-07-30
+## [0.5.2] - 2023-07-30
 - Fix handling of `index.md` at the root level.
 
 ## [0.5.0] - 2023-07-30
