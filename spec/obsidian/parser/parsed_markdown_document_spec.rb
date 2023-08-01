@@ -45,6 +45,12 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
     expect(links).to include(["/url", "foo"])
   end
 
+  it "Extracts raw links" do
+    parsed_document = create_instance("http://www.example.com https://www.example.com")
+    links = parsed_document.extract_links
+    expect(links).to include(["http://www.example.com", "http://www.example.com"], ["https://www.example.com", "https://www.example.com"])
+  end
+
   context "with a document tree" do
     let(:index) { Obsidian::Page.create_root }
 
