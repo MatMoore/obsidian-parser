@@ -17,9 +17,31 @@ module Obsidian
       \]\]
     }x
 
+    # Match URLs
+    # Pattern based on https://gist.github.com/dperini/729294
+    LONE_URL = %r{
+      (?<!\S) # not preceeded by a non-whitespace character
+      https?:// # Protocol
+      (?:\S+(?::\S*)?@)? # basic auth
+      (?![-_]) # Not followed by a dash or underscore
+      (?:[-\w\u00a1-\uffff]{0,63}[^-_]\.)+ # host and domain names
+      (?:[a-z\u00a1-\uffff]{2,}\.?) # top level domain
+      (?::\\d{2,5})? # Port number
+      (?:[/?#]\\S*)? # Resource path
+      (?!\S) # not followed by a non-whitespace character
+    }x
+
+    # Workaround for lack of auto-linking in Kramdown.
+    # Note: this breaks for URLs included in code blocks.
+    def self.auto_link(markdown_text)
+      markdown_text.gsub(LONE_URL) do |s|
+        "<#{s}>" # Kramdown-specific markup
+      end
+    end
+
     # Convert Obsidian-flavored-markdown syntax to something parseable
     # (i.e. with Github-flavored-markdown syntax)
-    def self.normalize(markdown_text, root)
+    def self.expand_wikilinks(markdown_text, root)
       markdown_text.gsub(WIKILINK_SYNTAX) do |s|
         text = $~[:text]
         target = $~[:target]
@@ -32,6 +54,10 @@ module Obsidian
 
         "[#{display_text}](#{href})"
       end
+    end
+
+    def self.normalize(markdown_text, root)
+      expand_wikilinks(auto_link(markdown_text), root)
     end
 
     # Parse links from obsidian-flavored-markdown text

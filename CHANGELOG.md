@@ -1,5 +1,8 @@
 ## [Unreleased]
+
+## [0.5.3] - 2023-08-01
 - Support non-fully qualified titles when parsing wikilink syntax.
+- Autolink raw URLs.
 
 ## [0.5.2] - 2023-07-30
 - Fix handling of `index.md` at the root level.

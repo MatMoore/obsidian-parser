@@ -39,5 +39,35 @@ RSpec.describe Obsidian::ObsidianFlavoredMarkdown do
       result = described_class.normalize("[[bar#baz]]", index)
       expect(result).to eq("[bar](foo/bar#baz)")
     end
+
+    it "autolinks full urls" do
+      result = described_class.normalize("hello https://www.google.com", index)
+      expect(result).to eq("hello <https://www.google.com>")
+    end
+
+    it "doesn't autolink URLs in backticks" do
+      result = described_class.normalize("hello `https://www.google.com`", index)
+      expect(result).to eq("hello `https://www.google.com`")
+    end
+
+    it "doesn't autolink URLs in parens" do
+      result = described_class.normalize("hello (https://www.google.com)", index)
+      expect(result).to eq("hello (https://www.google.com)")
+    end
+
+    it "doesn't autolink URLs in square brackets" do
+      result = described_class.normalize("hello [https://www.google.com]", index)
+      expect(result).to eq("hello [https://www.google.com]")
+    end
+
+    it "doesn't autolink URLs in angle brackets" do
+      result = described_class.normalize("hello <https://www.google.com>", index)
+      expect(result).to eq("hello <https://www.google.com>")
+    end
+
+    it "doesn't autolink URLs appended to other text" do
+      result = described_class.normalize("hellohttps://www.google.com", index)
+      expect(result).to eq("hellohttps://www.google.com")
+    end
   end
 end
