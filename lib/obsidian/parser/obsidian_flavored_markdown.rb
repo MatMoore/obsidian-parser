@@ -41,7 +41,7 @@ module Obsidian
 
     # Convert Obsidian-flavored-markdown syntax to something parseable
     # (i.e. with Github-flavored-markdown syntax)
-    def self.expand_wikilinks(markdown_text, root)
+    def self.expand_wikilinks(markdown_text, root:)
       markdown_text.gsub(WIKILINK_SYNTAX) do |s|
         text = $~[:text]
         target = $~[:target]
@@ -56,13 +56,15 @@ module Obsidian
       end
     end
 
-    def self.normalize(markdown_text, root)
-      expand_wikilinks(auto_link(markdown_text), root)
+    def self.normalize(markdown_text, root: nil)
+      auto_linked = auto_link(markdown_text)
+      return auto_linked if root.nil?
+
+      expand_wikilinks(auto_link(markdown_text), root: root)
     end
 
-    # Parse links from obsidian-flavored-markdown text
-    def self.parse(markdown_text, root)
-      document = Kramdown::Document.new(normalize(markdown_text, root), input: "GFM")
+    def self.parse(markdown_text, root: nil)
+      document = Kramdown::Document.new(normalize(markdown_text, root: root), input: "GFM")
       Obsidian::ParsedMarkdownDocument.new(document)
     end
   end

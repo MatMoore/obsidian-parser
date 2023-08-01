@@ -4,6 +4,7 @@ require_relative "parser/version"
 require_relative "parser/parsed_markdown_document"
 require_relative "parser/obsidian_flavored_markdown"
 require_relative "parser/page"
+require_relative "parser/markdown_content"
 
 require "forwardable"
 
@@ -12,18 +13,6 @@ module Obsidian
 
   def self.build_slug(title, parent_slug)
     (parent_slug == "") ? title : "#{parent_slug}/#{title}"
-  end
-
-  class MarkdownContent
-    def initialize(path, root)
-      @path = path
-      @root = root
-    end
-
-    def generate_html
-      markdown = @path.read
-      Obsidian::ObsidianFlavoredMarkdown.parse(markdown, @root).to_html
-    end
   end
 
   class Parser
