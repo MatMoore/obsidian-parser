@@ -15,13 +15,14 @@ module Obsidian
   end
 
   class MarkdownContent
-    def initialize(path)
+    def initialize(path, root)
       @path = path
+      @root = root
     end
 
     def generate_html
       markdown = @path.read
-      Obsidian::ObsidianFlavoredMarkdown.parse(markdown).to_html
+      Obsidian::ObsidianFlavoredMarkdown.parse(markdown, @root).to_html
     end
   end
 
@@ -49,7 +50,7 @@ module Obsidian
         @index.add_page(
           slug,
           last_modified: path.mtime,
-          content: MarkdownContent.new(path)
+          content: MarkdownContent.new(path, @index)
         )
       end
 

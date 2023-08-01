@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Support non-fully qualified titles when parsing wikilink syntax.
 
 ## [0.5.2] - 2023-07-30
 - Fix handling of `index.md` at the root level.

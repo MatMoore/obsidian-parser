@@ -19,21 +19,24 @@ module Obsidian
 
     # Convert Obsidian-flavored-markdown syntax to something parseable
     # (i.e. with Github-flavored-markdown syntax)
-    def self.normalize(markdown_text)
+    def self.normalize(markdown_text, root)
       markdown_text.gsub(WIKILINK_SYNTAX) do |s|
         text = $~[:text]
         target = $~[:target]
         fragment = $~[:fragment]
-        display_text = text.nil? ? target.split("/").last : text
-        href = fragment.nil? ? target : "#{target}##{fragment}"
+        page = root.find_in_tree(target)
+        return text.nil? ? target.split("/").last : text if page.nil?
+
+        display_text = text.nil? ? page.slug.split("/").last : text
+        href = fragment.nil? ? page.slug : "#{page.slug}##{fragment}"
 
         "[#{display_text}](#{href})"
       end
     end
 
     # Parse links from obsidian-flavored-markdown text
-    def self.parse(markdown_text)
-      document = Kramdown::Document.new(normalize(markdown_text), input: "GFM")
+    def self.parse(markdown_text, root)
+      document = Kramdown::Document.new(normalize(markdown_text, root), input: "GFM")
       Obsidian::ParsedMarkdownDocument.new(document)
     end
   end

@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
 RSpec.describe Obsidian::ParsedMarkdownDocument do
+  let(:index) { Obsidian::Page.create_root }
+
+  before do
+    index.add_page("foo/bar")
+    index.add_page("animals/cat")
+  end
+
   it "extracts [foo](bar) links" do
     markdown = "here is a link: [foo](bar)"
 
-    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, index)
     links = converter.extract_links
 
     expect(links).to include(["bar", "foo"])
@@ -13,7 +20,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
   it "extracts [foo](bar) links" do
     markdown = "here is a link: [foo](bar)"
 
-    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, index)
     links = converter.extract_links
 
     expect(links).to include(["bar", "foo"])
@@ -21,7 +28,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
 
   it "extracts links with titles" do
     markdown = '[link](/uri "title")'
-    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, index)
     links = converter.extract_links
 
     expect(links).to include(["/uri", "link"])
@@ -30,7 +37,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
   it "extracts links with no destinations" do
     markdown = "[link1]() [link2](<>)"
 
-    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, index)
     links = converter.extract_links
 
     expect(links).to include(["", "link1"], ["", "link2"])
@@ -43,7 +50,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
       [bar]: /url "title"
     END
 
-    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, index)
     links = converter.extract_links
 
     expect(links).to include(["/url", "foo"])
@@ -52,7 +59,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
   it "extracts wikilinks" do
     markdown = "[[animals/cat]]"
 
-    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    converter = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, index)
     links = converter.extract_links
 
     expect(links).to include(["animals/cat", "cat"])
