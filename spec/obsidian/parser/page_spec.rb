@@ -90,5 +90,13 @@ RSpec.describe Obsidian::Page do
 
       expect(root.find_in_tree("aa/bar/baz")).to eq(page)
     end
+
+    it "ignores /index in query strings" do
+      page = root.add_page("foo/bar")
+
+      expect(root.find_in_tree("foo/bar/index")).to eq(page)
+      expect(root.find_in_tree("foo/index/bar/index")).to eq(page)
+      expect(root.find_in_tree("foo/index")).to eq(page.parent)
+    end
   end
 end

@@ -103,16 +103,18 @@ module Obsidian
     # If there is an exact match, we should always return that
     # Otherwise, if we can skip over some anscestors and get a
     # match, then return the first, shortest match.
+    # If a query slug contains `/index` we ignore it and treat it
+    # the same as `/`
     def find_in_tree(query_slug)
       # Exact match
       return self if slug == query_slug
 
       # Partial match
-      query_parts = query_slug.split("/")
+      query_parts = query_slug.split("/").reject { |part| part == "index" }
       length = query_parts.size
       slug_parts = slug.split("/")
 
-      if slug_parts.length > length
+      if slug_parts.length >= length
         if slug_parts.slice(-length, length) == query_parts
           return self
         end

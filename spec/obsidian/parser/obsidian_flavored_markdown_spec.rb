@@ -45,6 +45,16 @@ RSpec.describe Obsidian::ObsidianFlavoredMarkdown do
       expect(result).to eq("[bar](foo/bar#baz)")
     end
 
+    it "expands wikilinks pointing to index files" do
+      result = described_class.normalize("[[foo/index]]", root: index)
+      expect(result).to eq("[foo](foo)")
+    end
+
+    it "expands wikilinks pointing to index files with custom display names" do
+      result = described_class.normalize("[[foo/index|bla]]", root: index)
+      expect(result).to eq("[bla](foo)")
+    end
+
     it "autolinks full urls" do
       result = described_class.normalize("hello https://www.google.com")
       expect(result).to eq("hello <https://www.google.com>")
