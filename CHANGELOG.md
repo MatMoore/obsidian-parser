@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Fix page getting clobbered when wikilinks point to non-existent pages.
 
 ## [0.5.3] - 2023-08-01
 - Support non-fully qualified titles when parsing wikilink syntax.

@@ -47,12 +47,15 @@ module Obsidian
         target = $~[:target]
         fragment = $~[:fragment]
         page = root.find_in_tree(target)
-        return text.nil? ? target.split("/").last : text if page.nil?
 
-        display_text = text.nil? ? page.slug.split("/").last : text
-        href = fragment.nil? ? page.slug : "#{page.slug}##{fragment}"
+        if page.nil?
+          text.nil? ? target.split("/").last : text
+        else
+          display_text = text.nil? ? page.slug.split("/").last : text
+          href = fragment.nil? ? page.slug : "#{page.slug}##{fragment}"
 
-        "[#{display_text}](#{href})"
+          "[#{display_text}](#{href})"
+        end
       end
     end
 

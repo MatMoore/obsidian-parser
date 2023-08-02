@@ -13,6 +13,11 @@ RSpec.describe Obsidian::ObsidianFlavoredMarkdown do
       expect(result).to eq("[foo](foo)")
     end
 
+    it "de-linkifies wikilinks that don't go away" do
+      result = described_class.normalize("[[missing-link]] [[foo]]", root: index)
+      expect(result).to eq("missing-link [foo](foo)")
+    end
+
     it "uses only the basepath for titles" do
       result = described_class.normalize("[[foo/bar]]", root: index)
       expect(result).to eq("[bar](foo/bar)")
