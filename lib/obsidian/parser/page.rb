@@ -31,7 +31,11 @@ module Obsidian
 
     # Apply percent encoding to the slug
     def uri
-      slug.split("/").map { |part| ERB::Util.url_encode(part) }.join("/")
+      if slug == ""
+        "/"
+      else
+        "/" + slug.split("/").map { |part| ERB::Util.url_encode(part) }.join("/")
+      end
     end
 
     def ==(other)

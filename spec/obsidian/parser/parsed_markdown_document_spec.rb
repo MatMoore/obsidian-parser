@@ -62,7 +62,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
     it "extracts wikilinks" do
       parsed_document = create_instance("[[animals/cat]]")
       links = parsed_document.extract_links
-      expect(links).to include(["animals/cat", "cat"])
+      expect(links).to include(["/animals/cat", "cat"])
     end
   end
 end
