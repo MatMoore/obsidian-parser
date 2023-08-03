@@ -2,6 +2,7 @@
 
 require "kramdown"
 require "kramdown-parser-gfm"
+require "markly"
 
 module Obsidian
   module ObsidianFlavoredMarkdown
@@ -67,8 +68,10 @@ module Obsidian
     end
 
     def self.parse(markdown_text, root: nil)
-      document = Kramdown::Document.new(normalize(markdown_text, root: root), input: "GFM")
-      Obsidian::ParsedMarkdownDocument.new(document)
+      normalized = normalize(markdown_text, root: root)
+      document = Kramdown::Document.new(normalized, input: "GFM")
+      document2 = Markly.parse(normalized, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
+      Obsidian::ParsedMarkdownDocument.new(document, document2)
     end
   end
 end

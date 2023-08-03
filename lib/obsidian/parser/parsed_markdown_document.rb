@@ -2,39 +2,38 @@
 
 module Obsidian
   class ParsedMarkdownDocument
-    def initialize(document)
-      @document = document
+    def initialize(document, document2)
+      @document2 = document
+      @document = document2
     end
 
     def extract_links
-      _extract_links(document.root)
+      results = []
+
+      document.walk do |node|
+        if node.type == :link
+          text = _extract_text_content(node)
+          href = node.url
+          results << [href, text]
+        end
+      end
+
+      results
     end
 
     def to_html
-      document.to_html
+      @document2.to_html
     end
 
     private
 
     attr_reader :document
 
-    def _extract_links(element)
-      if element.type == :a
-        [[element.attr["href"], _extract_text_content(element)]]
-      elsif !element.children.empty?
-        element.children.flat_map { |child| _extract_links(child) }
-      else
-        []
-      end
-    end
-
     def _extract_text_content(element)
       if element.type == :text
-        element.value
-      elsif !element.children.empty?
-        element.children.map { |child| _extract_text_content(child) }.join
+        element.string_content
       else
-        ""
+        element.each.map { |child| _extract_text_content(child) }.join
       end
     end
   end
