@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.6.1] - 2023-08-03
+- Prevent `HtmlRenderer` state being shared across documents
+
 ## [0.6.0] - 2023-08-03
 - Replace Kramdown with Markly
 - Enabled support for Github Flavored Markdown tables and tasklists
