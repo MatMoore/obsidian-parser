@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "kramdown"
-require "kramdown-parser-gfm"
 require "markly"
 
 module Obsidian
@@ -38,11 +36,10 @@ module Obsidian
       end
     end
 
-    def self.parse(markdown_text, root: nil)
+    def self.parse(markdown_text, renderer:, root: nil)
       normalized = expand_wikilinks(markdown_text, root: root)
-      document = Kramdown::Document.new(normalized, input: "GFM")
-      document2 = Markly.parse(normalized, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
-      Obsidian::ParsedMarkdownDocument.new(document, document2)
+      document = Markly.parse(normalized, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
+      Obsidian::ParsedMarkdownDocument.new(document, renderer: renderer)
     end
   end
 end

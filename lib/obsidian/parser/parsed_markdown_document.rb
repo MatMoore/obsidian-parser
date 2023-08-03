@@ -2,9 +2,9 @@
 
 module Obsidian
   class ParsedMarkdownDocument
-    def initialize(document, document2)
-      @document2 = document
-      @document = document2
+    def initialize(document, renderer:)
+      @document = document
+      @renderer = renderer
     end
 
     def extract_links
@@ -22,12 +22,13 @@ module Obsidian
     end
 
     def to_html
-      @document2.to_html
+      renderer.render(document)
     end
 
     private
 
     attr_reader :document
+    attr_reader :renderer
 
     def _extract_text_content(element)
       if element.type == :text

@@ -4,7 +4,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
   let(:index) { nil }
 
   def create_instance(markdown)
-    Obsidian::ObsidianFlavoredMarkdown.parse(markdown, root: index)
+    Obsidian::ObsidianFlavoredMarkdown.parse(markdown, root: index, renderer: HtmlRenderer.new)
   end
 
   it "extracts [foo](bar) links" do
@@ -38,7 +38,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
       [bar]: /url "title"
     END
 
-    parsed_document = Obsidian::ObsidianFlavoredMarkdown.parse(markdown)
+    parsed_document = Obsidian::ObsidianFlavoredMarkdown.parse(markdown, renderer: HtmlRenderer.new)
 
     links = parsed_document.extract_links
 

@@ -5,6 +5,7 @@ require_relative "parser/parsed_markdown_document"
 require_relative "parser/obsidian_flavored_markdown"
 require_relative "parser/page"
 require_relative "parser/markdown_content"
+require_relative "parser/html_renderer"
 
 require "forwardable"
 
@@ -20,6 +21,7 @@ module Obsidian
 
     def initialize(vault_directory)
       @index = Obsidian::Page.create_root
+      renderer = HtmlRenderer.new
 
       vault_directory.glob("**/*.md").each do |path|
         dirname, basename = path.relative_path_from(vault_directory).split
@@ -39,7 +41,7 @@ module Obsidian
         @index.add_page(
           slug,
           last_modified: path.mtime,
-          content: MarkdownContent.new(path, @index)
+          content: MarkdownContent.new(path, @index, renderer: renderer)
         )
       end
 
