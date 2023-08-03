@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    obsidian-parser (0.5.4)
+    obsidian-parser (0.6.0)
       markly (~> 0.7.0)
 
 GEM

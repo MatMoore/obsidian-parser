@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## [0.6.0] - 2023-08-03
 - Replace Kramdown with Markly
 - Enabled support for Github Flavored Markdown tables and tasklists
 - Rename `MarkdownContent` -> `MarkdownDocument`, `ObsidianFlavoredMarkdown` -> `MarkdownParser`
