@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.6.2] - 2023-08-03
+- Fix wikilinks pointing to slugs with spaces not rendering properly.
+
 ## [0.6.1] - 2023-08-03
 - Prevent `HtmlRenderer` state being shared across documents
 

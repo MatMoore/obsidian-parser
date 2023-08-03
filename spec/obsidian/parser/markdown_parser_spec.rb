@@ -55,5 +55,11 @@ RSpec.describe Obsidian::MarkdownParser do
       result = parser.expand_wikilinks("[[foo/index|bla]]", root: index)
       expect(result).to eq("[bla](foo)")
     end
+
+    it "URL encodes wiklink targets that have spaces in them" do
+      index.add_page("foo/page with spaces")
+      result = parser.expand_wikilinks("[[page with spaces]]", root: index)
+      expect(result).to eq("[page with spaces](foo/page%20with%20spaces)")
+    end
   end
 end

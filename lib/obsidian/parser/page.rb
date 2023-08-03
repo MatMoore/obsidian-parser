@@ -29,6 +29,11 @@ module Obsidian
       "Page(title: #{title.inspect}, slug: #{slug.inspect})"
     end
 
+    # Apply percent encoding to the slug
+    def uri
+      slug.split("/").map { |part| ERB::Util.url_encode(part) }.join("/")
+    end
+
     def ==(other)
       self.class == other.class &&
         !slug.nil? &&

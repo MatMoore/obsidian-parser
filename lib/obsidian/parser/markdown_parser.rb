@@ -28,8 +28,8 @@ module Obsidian
         if page.nil?
           text.nil? ? target.split("/").last : text
         else
-          display_text = text.nil? ? page.slug.split("/").last : text
-          href = fragment.nil? ? page.slug : "#{page.slug}##{fragment}"
+          display_text = text.nil? ? page.title : text
+          href = fragment.nil? ? page.uri : "#{page.uri}##{fragment}"
 
           "[#{display_text}](#{href})"
         end
