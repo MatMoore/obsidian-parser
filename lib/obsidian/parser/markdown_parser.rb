@@ -3,7 +3,7 @@
 require "markly"
 
 module Obsidian
-  module ObsidianFlavoredMarkdown
+  class MarkdownParser
     WIKILINK_SYNTAX = %r{
       \[\[
       (?<target>[^\]\#|]*) # link target
@@ -16,9 +16,13 @@ module Obsidian
       \]\]
     }x
 
+    def initialize(renderer: HtmlRenderer.new)
+      @renderer = renderer
+    end
+
     # Convert Obsidian-flavored-markdown syntax to something parseable
     # (i.e. with Github-flavored-markdown syntax)
-    def self.expand_wikilinks(markdown_text, root:)
+    def expand_wikilinks(markdown_text, root:)
       markdown_text.gsub(WIKILINK_SYNTAX) do |s|
         text = $~[:text]
         target = $~[:target]
@@ -36,10 +40,14 @@ module Obsidian
       end
     end
 
-    def self.parse(markdown_text, renderer:, root: nil)
+    def parse(markdown_text, root: nil)
       normalized = expand_wikilinks(markdown_text, root: root)
       document = Markly.parse(normalized, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
       Obsidian::ParsedMarkdownDocument.new(document, renderer: renderer)
     end
+
+    private
+
+    attr_reader :renderer
   end
 end

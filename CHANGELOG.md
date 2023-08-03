@@ -1,6 +1,7 @@
 ## [Unreleased]
 - Replace Kramdown with Markly
 - Enabled support for Github Flavored Markdown tables and tasklists
+- Rename `MarkdownContent` -> `MarkdownDocument`, `ObsidianFlavoredMarkdown` -> `MarkdownParser`
 
 ## [0.5.4] - 2023-08-02
 - Fix page getting clobbered when wikilinks point to non-existent pages.
