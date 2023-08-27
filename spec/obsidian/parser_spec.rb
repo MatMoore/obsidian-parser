@@ -39,20 +39,20 @@ RSpec.describe Obsidian::Parser do
   end
 
   it "converts markdown into HTML content" do
-    expect(parser.pages.find { |note| note.title == "cat" }.content.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n<p>Meow meow meow</p>\n")
+    expect(parser.pages.find { |note| note.title == "cat" }.generate_html).to eq("<h2 id=\"cats-are-the-best\">Cats are the best</h2>\n<p>Meow meow meow</p>\n")
   end
 
   it "adds index.md content to index pages" do
     animals = parser.index.find_in_tree("animals")
 
     expect(animals.children.map(&:title)).not_to include("index")
-    expect(animals.content&.generate_html).to eq("<p>Animals page</p>\n")
+    expect(animals.generate_html).to eq("<p>Animals page</p>\n")
   end
 
   it "adds index.md content to the root" do
-    content = parser.index.content
+    content = parser.index.generate_html
 
-    expect(content&.generate_html).to eq("<p>Blahhhh</p>\n")
+    expect(content).to eq("<p>Blahhhh</p>\n")
   end
 
   describe ".media_index" do

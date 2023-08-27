@@ -4,7 +4,6 @@ require_relative "parser/version"
 require_relative "parser/parsed_markdown_document"
 require_relative "parser/markdown_parser"
 require_relative "parser/page"
-require_relative "parser/markdown_document"
 require_relative "parser/html_renderer"
 require_relative "parser/content_type"
 
@@ -63,7 +62,7 @@ module Obsidian
       @index.add_page(
         slug,
         last_modified: last_modified,
-        content: MarkdownDocument.new(path, @index, markdown_parser: markdown_parser)
+        content: lambda { path.read }
       )
     end
 

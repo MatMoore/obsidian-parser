@@ -1,4 +1,6 @@
 ## [Unreleased]
+- Added support for wikilinks that embed files. These are rendered as images or links in the HTML content.
+- Added method `#page.generate_html` to replace `#page.content.generate_html`, and removed the `MarkdownDocument` class. `#page.content` is now a callable that returns the markdown content.
 
 ## [0.7.0] - 2023-08-03
 - Fix wikilinks pointing to slugs with spaces not rendering properly.

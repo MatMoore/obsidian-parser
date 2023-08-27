@@ -18,6 +18,7 @@ module Obsidian
       @last_modified = last_modified
       @content = content
       @parent = parent
+      @root = parent.nil? ? self : parent.root
       @children = {}
       @content_type = content_type
     end
@@ -141,11 +142,18 @@ module Obsidian
       nil
     end
 
+    def generate_html(markdown_parser: MarkdownParser.new)
+      return nil if content.nil?
+
+      markdown_parser.parse(content.call, root: root).to_html
+    end
+
     attr_reader :title
     attr_reader :slug
     attr_reader :last_modified
     attr_reader :content
     attr_reader :content_type
     attr_reader :parent
+    attr_reader :root
   end
 end
