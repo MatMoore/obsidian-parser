@@ -26,9 +26,9 @@ module Obsidian
       markdown_parser = MarkdownParser.new
 
       vault_directory.glob("**/*").each do |path|
-        dirname, basename = path.relative_path_from(vault_directory).split
+        next if path.directory?
 
-        next if basename == "."
+        dirname, basename = path.relative_path_from(vault_directory).split
 
         # Remove the path component "./" from the start of the dirname
         parent_slug = dirname.to_s.gsub(/\A\.\/?/, "")
@@ -36,7 +36,7 @@ module Obsidian
         if basename.to_s.end_with?(".md")
           add_markdown_file(basename: basename, parent_slug: parent_slug, path: path, last_modified: path.mtime, markdown_parser: markdown_parser)
         else
-          add_media_file(basename: basename, parent_slug: parent_slug, last_modified: path.mtime)
+          add_media_file(basename: basename, parent_slug: parent_slug, last_modified: path.mtime, path: path)
         end
       end
 
@@ -67,11 +67,11 @@ module Obsidian
       )
     end
 
-    def add_media_file(basename:, parent_slug:, last_modified:)
+    def add_media_file(basename:, parent_slug:, last_modified:, path:)
       @media_index.add_page(
         Obsidian.build_slug(basename.to_s, parent_slug),
         last_modified: last_modified,
-        content_type: PretendEverythingIsAnImage.new
+        content_type: ContentType.new(path)
       )
     end
   end

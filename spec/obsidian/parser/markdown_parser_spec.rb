@@ -66,7 +66,11 @@ RSpec.describe Obsidian::MarkdownParser do
       let(:media_root) { Obsidian::Page.create_root }
 
       before do
-        media_root.add_page("foo/bar.jpg", content_type: PretendEverythingIsAnImage.new)
+        path = Pathname.new(__dir__).join("../../example_vault/foo/bar.jpg")
+        media_root.add_page("foo/bar.jpg", content_type: ContentType.new(path))
+
+        path = Pathname.new(__dir__).join("../../example_vault/hello_world.txt")
+        media_root.add_page("hello_world.txt", content_type: ContentType.new(path))
       end
 
       it "expands image wikilinks" do
@@ -93,6 +97,11 @@ RSpec.describe Obsidian::MarkdownParser do
         index.add_page("foo/bar")
         result = parser.expand_attachments("![[bar]]", root: index, media_root: media_root)
         expect(result).to eq("[bar](/foo/bar)")
+      end
+
+      it "falls back to a link if the target is not an image" do
+        result = parser.expand_attachments("![[hello_world.txt]]", root: index, media_root: media_root)
+        expect(result).to eq("[hello_world.txt](/hello_world.txt)")
       end
 
       it "falls back to plain text if there is no such page" do

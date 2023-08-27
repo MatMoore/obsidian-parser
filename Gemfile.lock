@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     obsidian-parser (0.7.0)
+      marcel (~> 0.3.1)
       markly (~> 0.7.0)
 
 GEM
@@ -13,8 +14,17 @@ GEM
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
+    marcel (0.3.3)
+      mimemagic (~> 0.3.2)
     markly (0.7.0)
     method_source (1.0.0)
+    mimemagic (0.3.10)
+      nokogiri (~> 1)
+      rake
+    nokogiri (1.15.4-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.4-x86_64-linux)
+      racc (~> 1.4)
     parallel (1.23.0)
     parser (3.2.2.3)
       ast (~> 2.4.1)
