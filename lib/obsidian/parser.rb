@@ -34,9 +34,9 @@ module Obsidian
         parent_slug = dirname.to_s.gsub(/\A\.\/?/, "")
 
         if basename.to_s.end_with?(".md")
-          index_markdown(basename: basename, parent_slug: parent_slug, path: path, last_modified: path.mtime, markdown_parser: markdown_parser)
+          add_markdown_file(basename: basename, parent_slug: parent_slug, path: path, last_modified: path.mtime, markdown_parser: markdown_parser)
         else
-          index_media(basename: basename, parent_slug: parent_slug, last_modified: path.mtime)
+          add_media_file(basename: basename, parent_slug: parent_slug, last_modified: path.mtime)
         end
       end
 
@@ -51,7 +51,7 @@ module Obsidian
 
     private
 
-    def index_markdown(basename:, parent_slug:, last_modified:, path:, markdown_parser:)
+    def add_markdown_file(basename:, parent_slug:, last_modified:, path:, markdown_parser:)
       if basename.to_s == "index.md"
         slug = parent_slug.to_s.gsub(/\.md\z/, "")
       else
@@ -62,11 +62,12 @@ module Obsidian
       @index.add_page(
         slug,
         last_modified: last_modified,
-        content: lambda { path.read }
+        content: lambda { path.read },
+        media_root: @media_index
       )
     end
 
-    def index_media(basename:, parent_slug:, last_modified:)
+    def add_media_file(basename:, parent_slug:, last_modified:)
       @media_index.add_page(
         Obsidian.build_slug(basename.to_s, parent_slug),
         last_modified: last_modified,

@@ -78,10 +78,11 @@ module Obsidian
       end
     end
 
-    def parse(markdown_text, root: nil)
+    def parse(markdown_text, root: nil, media_root: nil)
       renderer = HtmlRenderer.new
-      normalized = expand_wikilinks(markdown_text, root: root)
-      document = Markly.parse(normalized, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
+      normalized1 = expand_attachments(markdown_text, root: root, media_root: media_root)
+      normalized2 = expand_wikilinks(normalized1, root: root)
+      document = Markly.parse(normalized2, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
       Obsidian::ParsedMarkdownDocument.new(document, renderer: renderer)
     end
   end

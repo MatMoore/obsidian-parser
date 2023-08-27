@@ -4,14 +4,23 @@ module Obsidian
   # A page in the vault corresponding to either a markdown document,
   # or a directory containing other documents.
   #
-  # If a directory contains an index.md, that is used as the content of
-  # the directory page; otherwise content will be nil.
+  # If a directory contains an index.md, that will become the directory
+  # index page. Otherwise, the index page is inferred and will have no
+  # content (#generate_html will return nil).
+  #
+  # Each page belongs to a tree of pages nested under the root page
+  # (the one with slug = "").
+  #
+  # Pages may optionally be associated with a media root, which is
+  # a separate tree containing attachment files. If this is present,
+  # markdown rendering will take into account these attachments when
+  # encountering wikilink syntax.
   class Page
     def self.create_root
       Page.new(title: "", slug: "")
     end
 
-    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil)
+    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil, media_root: nil)
       # TODO: check frontmatter for titles as well
       @title = title
       @slug = slug
@@ -21,6 +30,7 @@ module Obsidian
       @root = parent.nil? ? self : parent.root
       @children = {}
       @content_type = content_type
+      @media_root = media_root
     end
 
     def is_index?
@@ -56,7 +66,7 @@ module Obsidian
     # Call this method on the root page.
     # When calling this method, you must ensure that anscestor pages
     # are added before their descendents.
-    def add_page(slug, last_modified: nil, content: nil, content_type: nil)
+    def add_page(slug, last_modified: nil, content: nil, content_type: nil, media_root: nil)
       path_components = slug.split("/")
 
       if path_components.empty?
@@ -76,13 +86,14 @@ module Obsidian
         slug: slug,
         last_modified: last_modified,
         content: content,
-        content_type: content_type
+        content_type: content_type,
+        media_root: media_root
       ).tap do |page|
         page.update_content(content: content, last_modified: last_modified)
       end
     end
 
-    def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil)
+    def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil, media_root: nil)
       # TODO: validate slug matches the current page slug
 
       @children[title] ||= Page.new(
@@ -91,7 +102,8 @@ module Obsidian
         last_modified: last_modified,
         content: content,
         content_type: content_type,
-        parent: self
+        parent: self,
+        media_root: media_root
       )
     end
 
@@ -145,7 +157,7 @@ module Obsidian
     def generate_html(markdown_parser: MarkdownParser.new)
       return nil if content.nil?
 
-      markdown_parser.parse(content.call, root: root).to_html
+      markdown_parser.parse(content.call, root: root, media_root: media_root).to_html
     end
 
     attr_reader :title
@@ -155,5 +167,6 @@ module Obsidian
     attr_reader :content_type
     attr_reader :parent
     attr_reader :root
+    attr_reader :media_root
   end
 end
