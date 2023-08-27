@@ -18,31 +18,26 @@ module Obsidian
 
   class Parser
     attr_reader :index
+    attr_reader :media_index
 
     def initialize(vault_directory)
       @index = Obsidian::Page.create_root
+      @media_index = Obsidian::Page.create_root
       markdown_parser = MarkdownParser.new
 
-      vault_directory.glob("**/*.md").each do |path|
+      vault_directory.glob("**/*").each do |path|
         dirname, basename = path.relative_path_from(vault_directory).split
 
         next if basename == "."
 
-        # Remove the path component "." from the start of the dirname
+        # Remove the path component "./" from the start of the dirname
         parent_slug = dirname.to_s.gsub(/\A\.\/?/, "")
 
-        if basename.to_s == "index.md"
-          slug = parent_slug.to_s.gsub(/\.md\z/, "")
+        if basename.to_s.end_with?(".md")
+          index_markdown(basename: basename, parent_slug: parent_slug, path: path, last_modified: path.mtime, markdown_parser: markdown_parser)
         else
-          title = basename.to_s.gsub(/\.md\z/, "")
-          slug = Obsidian.build_slug(title, parent_slug)
+          index_media(basename: basename, parent_slug: parent_slug, last_modified: path.mtime)
         end
-
-        @index.add_page(
-          slug,
-          last_modified: path.mtime,
-          content: MarkdownDocument.new(path, @index, markdown_parser: markdown_parser)
-        )
       end
 
       # TODO: capture links between notes
@@ -52,6 +47,30 @@ module Obsidian
       result = []
       index.walk_tree { |page| result << page }
       result
+    end
+
+    private
+
+    def index_markdown(basename:, parent_slug:, last_modified:, path:, markdown_parser:)
+      if basename.to_s == "index.md"
+        slug = parent_slug.to_s.gsub(/\.md\z/, "")
+      else
+        title = basename.to_s.gsub(/\.md\z/, "")
+        slug = Obsidian.build_slug(title, parent_slug)
+      end
+
+      @index.add_page(
+        slug,
+        last_modified: last_modified,
+        content: MarkdownDocument.new(path, @index, markdown_parser: markdown_parser)
+      )
+    end
+
+    def index_media(basename:, parent_slug:, last_modified:)
+      @media_index.add_page(
+        Obsidian.build_slug(basename.to_s, parent_slug),
+        last_modified: last_modified
+      )
     end
   end
 end

@@ -54,4 +54,20 @@ RSpec.describe Obsidian::Parser do
 
     expect(content&.generate_html).to eq("<p>Blahhhh</p>\n")
   end
+
+  describe ".media_index" do
+    subject(:media_index) { parser.media_index }
+
+    it "includes attachments at the top level" do
+      expect(media_index.find_in_tree("hello_world.txt")&.slug).to eq("hello_world.txt")
+    end
+
+    it "includes nested attachments" do
+      expect(media_index.find_in_tree("animals/some_attachment.txt")&.slug).to eq("animals/some_attachment.txt")
+    end
+
+    it "excludes hidden files" do
+      expect(media_index.find_in_tree(".hidden_file.txt")).to be_nil
+    end
+  end
 end
