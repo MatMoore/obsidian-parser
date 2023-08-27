@@ -61,5 +61,44 @@ RSpec.describe Obsidian::MarkdownParser do
       result = parser.expand_wikilinks("[[page with spaces]]", root: index)
       expect(result).to eq("[page with spaces](/foo/page%20with%20spaces)")
     end
+
+    context "with attachments" do
+      let(:media_root) { Obsidian::Page.create_root }
+
+      before do
+        media_root.add_page("foo/bar.jpg", content_type: PretendEverythingIsAnImage.new)
+      end
+
+      it "expands image wikilinks" do
+        result = parser.expand_attachments("![[foo/bar.jpg]]", root: index, media_root: media_root)
+        expect(result).to eq("![](/foo/bar.jpg)")
+      end
+
+      it "expands image wikilinks that leave out a prefix" do
+        result = parser.expand_attachments("![[bar.jpg]]", root: index, media_root: media_root)
+        expect(result).to eq("![](/foo/bar.jpg)")
+      end
+
+      it "expands image wikilinks that leave out a prefix" do
+        result = parser.expand_attachments("![[bar.jpg]]", root: index, media_root: media_root)
+        expect(result).to eq("![](/foo/bar.jpg)")
+      end
+
+      it "includes alt text for image wikilinks" do
+        result = parser.expand_attachments("![[bar.jpg|a man walks into a bar]]", root: index, media_root: media_root)
+        expect(result).to eq("![a man walks into a bar](/foo/bar.jpg)")
+      end
+
+      it "falls back to a link if the target is a regular markdown document" do
+        index.add_page("foo/bar")
+        result = parser.expand_attachments("![[bar]]", root: index, media_root: media_root)
+        expect(result).to eq("[bar](/foo/bar)")
+      end
+
+      it "falls back to plain text if there is no such page" do
+        result = parser.expand_attachments("![[banana|a yellow banana]]", root: index, media_root: media_root)
+        expect(result).to eq("a yellow banana")
+      end
+    end
   end
 end

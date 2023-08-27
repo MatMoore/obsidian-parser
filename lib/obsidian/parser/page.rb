@@ -11,7 +11,7 @@ module Obsidian
       Page.new(title: "", slug: "")
     end
 
-    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil)
+    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil)
       # TODO: check frontmatter for titles as well
       @title = title
       @slug = slug
@@ -19,6 +19,7 @@ module Obsidian
       @content = content
       @parent = parent
       @children = {}
+      @content_type = content_type
     end
 
     def is_index?
@@ -54,7 +55,7 @@ module Obsidian
     # Call this method on the root page.
     # When calling this method, you must ensure that anscestor pages
     # are added before their descendents.
-    def add_page(slug, last_modified: nil, content: nil)
+    def add_page(slug, last_modified: nil, content: nil, content_type: nil)
       path_components = slug.split("/")
 
       if path_components.empty?
@@ -73,13 +74,14 @@ module Obsidian
         title: title,
         slug: slug,
         last_modified: last_modified,
-        content: content
+        content: content,
+        content_type: content_type
       ).tap do |page|
         page.update_content(content: content, last_modified: last_modified)
       end
     end
 
-    def get_or_create_child(title:, slug:, last_modified: nil, content: nil)
+    def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil)
       # TODO: validate slug matches the current page slug
 
       @children[title] ||= Page.new(
@@ -87,6 +89,7 @@ module Obsidian
         title: title,
         last_modified: last_modified,
         content: content,
+        content_type: content_type,
         parent: self
       )
     end
@@ -142,6 +145,7 @@ module Obsidian
     attr_reader :slug
     attr_reader :last_modified
     attr_reader :content
+    attr_reader :content_type
     attr_reader :parent
   end
 end

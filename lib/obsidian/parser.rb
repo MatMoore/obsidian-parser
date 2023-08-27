@@ -6,6 +6,7 @@ require_relative "parser/markdown_parser"
 require_relative "parser/page"
 require_relative "parser/markdown_document"
 require_relative "parser/html_renderer"
+require_relative "parser/content_type"
 
 require "forwardable"
 
@@ -69,7 +70,8 @@ module Obsidian
     def index_media(basename:, parent_slug:, last_modified:)
       @media_index.add_page(
         Obsidian.build_slug(basename.to_s, parent_slug),
-        last_modified: last_modified
+        last_modified: last_modified,
+        content_type: PretendEverythingIsAnImage.new
       )
     end
   end
