@@ -49,6 +49,12 @@ module Obsidian
       result
     end
 
+    def media
+      result = []
+      media_index.walk_tree { |page| result << page }
+      result
+    end
+
     private
 
     def add_markdown_file(basename:, parent_slug:, last_modified:, path:, markdown_parser:)
@@ -71,7 +77,8 @@ module Obsidian
       @media_index.add_page(
         Obsidian.build_slug(basename.to_s, parent_slug),
         last_modified: last_modified,
-        content_type: ContentType.new(path)
+        content_type: ContentType.new(path),
+        source_path: path
       )
     end
   end

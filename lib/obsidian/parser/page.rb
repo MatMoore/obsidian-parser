@@ -20,7 +20,7 @@ module Obsidian
       Page.new(title: "", slug: "")
     end
 
-    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil, media_root: nil)
+    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil, media_root: nil, source_path: nil)
       # TODO: check frontmatter for titles as well
       @title = title
       @slug = slug
@@ -31,6 +31,7 @@ module Obsidian
       @children = {}
       @content_type = content_type
       @media_root = media_root
+      @source_path = source_path
     end
 
     def is_index?
@@ -66,7 +67,7 @@ module Obsidian
     # Call this method on the root page.
     # When calling this method, you must ensure that anscestor pages
     # are added before their descendents.
-    def add_page(slug, last_modified: nil, content: nil, content_type: nil, media_root: nil)
+    def add_page(slug, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil)
       path_components = slug.split("/")
 
       if path_components.empty?
@@ -87,13 +88,14 @@ module Obsidian
         last_modified: last_modified,
         content: content,
         content_type: content_type,
-        media_root: media_root
+        media_root: media_root,
+        source_path: source_path
       ).tap do |page|
         page.update_content(content: content, last_modified: last_modified)
       end
     end
 
-    def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil, media_root: nil)
+    def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil)
       # TODO: validate slug matches the current page slug
 
       @children[title] ||= Page.new(
@@ -103,7 +105,8 @@ module Obsidian
         content: content,
         content_type: content_type,
         parent: self,
-        media_root: media_root
+        media_root: media_root,
+        source_path: source_path
       )
     end
 
@@ -168,5 +171,6 @@ module Obsidian
     attr_reader :parent
     attr_reader :root
     attr_reader :media_root
+    attr_reader :source_path
   end
 end
