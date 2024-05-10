@@ -6,6 +6,7 @@ require_relative "parser/markdown_parser"
 require_relative "parser/page"
 require_relative "parser/html_renderer"
 require_relative "parser/content_type"
+require_relative "parser/frontmatter_parser"
 
 require "forwardable"
 
