@@ -4,6 +4,7 @@ PATH
     obsidian-parser (0.7.0)
       marcel (~> 0.3.1)
       markly (~> 0.7.0)
+      tilt (~> 2.0, >= 2.0.8)
 
 GEM
   remote: https://rubygems.org/
@@ -77,6 +78,7 @@ GEM
     standard-performance (1.1.1)
       lint_roller (~> 1.1)
       rubocop-performance (~> 1.18.0)
+    tilt (2.3.0)
     unicode-display_width (2.4.2)
 
 PLATFORMS

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# TODO: remove this dependency
+require "tilt/erb"
+
 module Obsidian
   # A page in the vault corresponding to either a markdown document,
   # or a directory containing other documents.

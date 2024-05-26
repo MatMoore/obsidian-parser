@@ -1,6 +1,6 @@
 # Obsidian::Parser
 
-A (work in progress) gem to parse notes created with the Obsidian note-taking tool.
+A gem to parse notes created with the Obsidian note-taking tool.
 
 ## Installation
 
@@ -13,24 +13,38 @@ If bundler is not being used to manage dependencies, install the gem by executin
     $ gem install obsidian-parser
 
 ## Usage
-WARNING: This API is not yet finalized.
+
+Parse the vault with:
 
 ```ruby
+require 'obsidian/parser'
 parser = Obsidian::Parser.new(Pathname.new("/path/to/vault"))
-
-puts parser.index.notes
-# -> [ Note(title: "README", slug: "README") ]
-
-puts parser.index.directories
-# -> [ Index(title: "Drafts", slug: "Drafts"),
-#      Index(title: "Projects", slug: "Projects") ]
 ```
 
-### Generating HTML
+The return object allows you to iterate over all pages in the vault.
+
+A page is any note or directory within the vault.
+
+If a directory contains an `index.md`, that will be used as the directory content. Otherwise, the directory will have no content.
+
 ```ruby
-title = note.title
-content = note.content
-content.generate_html
+puts parser.pages
+# -> [ Page(title: "", slug: ""), Page(title: "Foo", slug: "Foo"), Page(title: "Bar", slug: "Foo/Bar") ]
+```
+
+You can fetch pages by their slug (the relative path, without a leading slash):
+
+```ruby
+page = parser.index.find_in_tree("foo/bar")
+```
+
+Page objects have titles, slugs, and a callable to fetch their content:
+
+```ruby
+page = parser.pages[-1]
+title = page.title
+markdown = page.content.call
+html = page.generate_html
 ```
 
 ## Development
