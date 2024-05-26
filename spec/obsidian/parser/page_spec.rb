@@ -99,4 +99,41 @@ RSpec.describe Obsidian::Page do
       expect(root.find_in_tree("foo/index")).to eq(page.parent)
     end
   end
+
+  describe "#referenced?" do
+    it "is false by default" do
+      expect(root.referenced?).to eq(false)
+    end
+
+    it "is true after #mark_referenced is called" do
+      root.mark_referenced
+      expect(root.referenced?).to eq(true)
+    end
+
+    it "is true after #mark_referenced is called on a child node" do
+      page = root.add_page("foo/bar")
+      page.mark_referenced
+      expect(page.referenced?).to eq(true)
+      expect(page.parent.referenced?).to eq(true)
+      expect(root.referenced?).to eq(true)
+    end
+  end
+
+  describe "#prune!" do
+    it "does not delete referenced pages" do
+      root.add_page("foo/bar").mark_referenced
+      root.prune!
+      expect(root.find_in_tree("foo/bar")).not_to be_nil
+    end
+
+    it "deletes unreferenced pages" do
+      root.add_page("foo/bar").mark_referenced
+      page = root.add_page("foo/baz")
+      expect(page.referenced?).to eq(false)
+      root.prune!
+      expect(root.find_in_tree("foo")).not_to be_nil
+      expect(root.find_in_tree("foo/bar")).not_to be_nil
+      expect(root.find_in_tree("foo/baz")).to be_nil
+    end
+  end
 end

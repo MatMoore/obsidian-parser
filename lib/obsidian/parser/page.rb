@@ -32,6 +32,7 @@ module Obsidian
       @content_type = content_type
       @media_root = media_root
       @source_path = source_path
+      @referenced = false
     end
 
     def is_index?
@@ -161,6 +162,29 @@ module Obsidian
       return nil if content.nil?
 
       markdown_parser.parse(content.call, root: root, media_root: media_root).to_html
+    end
+
+    def referenced?
+      @referenced
+    end
+
+    # Mark the tree containing this page as being "referenced"
+    # i.e. reachable through links
+    def mark_referenced
+      @referenced = true
+      parent&.mark_referenced
+    end
+
+    # Remove any child paths that are unreferenced,
+    # i.e. not reachable through links
+    def prune!
+      @children = @children.delete_if do |k, v|
+        !v.referenced?
+      end
+
+      @children.values.each do |page|
+        page.prune!
+      end
     end
 
     attr_reader :title
