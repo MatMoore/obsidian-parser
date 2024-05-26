@@ -11,7 +11,6 @@ class Obsidian::MarkdownParser::FrontMatterParser
     complete = false
 
     if first_line.chomp != "---"
-      puts "bye"
       return {}
     end
 
@@ -24,9 +23,6 @@ class Obsidian::MarkdownParser::FrontMatterParser
       end
       lines << line
     end
-
-    puts lines
-    puts complete
 
     complete ? YAML.safe_load(lines.join) : {}
   rescue YAML::SyntaxError, StopIteration

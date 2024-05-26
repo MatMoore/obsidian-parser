@@ -7,3 +7,7 @@ Huge classes
 
 - Page has lots of optional arguments that should not really be optional
 - Could perhaps extract out some graph behaviour to a mixin
+
+ParsedMarkdownDocument
+
+- Would be useful for this to contain information from the unparsed document
