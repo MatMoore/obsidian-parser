@@ -2,6 +2,7 @@
 
 RSpec.describe(Obsidian::MarkdownParser::FrontMatterParser) do
   subject(:parser) { described_class.new }
+
   it "parses valid yaml" do
     content = %(---
 foo: 1

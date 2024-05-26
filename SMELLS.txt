@@ -1,0 +1,9 @@
+Bad naming
+
+- MarkdownParser does more than parse markdown - it takes a file from the vault and parses it into an object that can be inspected
+- The document argument of ParsedMarkdownDocument is very vague
+
+Huge classes
+
+- Page has lots of optional arguments that should not really be optional
+- Could perhaps extract out some graph behaviour to a mixin

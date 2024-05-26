@@ -2,9 +2,11 @@
 
 module Obsidian
   class ParsedMarkdownDocument
-    def initialize(document, renderer:)
+    def initialize(document, renderer:, frontmatter: {})
       @document = document
       @renderer = renderer
+      @links = extract_links
+      @frontmatter = frontmatter
     end
 
     def extract_links
@@ -24,6 +26,9 @@ module Obsidian
     def to_html
       renderer.render(document)
     end
+
+    attr_reader :frontmatter
+    attr_reader :links
 
     private
 

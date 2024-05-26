@@ -28,6 +28,11 @@ module Obsidian
       \]\]
     }x
 
+    def initialize(frontmatter_parser: FrontMatterParser.new, renderer: HtmlRenderer.new)
+      @frontmatter_parser = frontmatter_parser
+      @renderer = renderer
+    end
+
     # Convert Obsidian-flavored-markdown syntax to something parseable
     # (i.e. with Github-flavored-markdown syntax)
     def expand_wikilinks(markdown_text, root:)
@@ -79,11 +84,16 @@ module Obsidian
     end
 
     def parse(markdown_text, root: nil, media_root: nil)
-      renderer = HtmlRenderer.new
+      frontmatter = frontmatter_parser.parse(markdown_text)
       normalized1 = expand_attachments(markdown_text, root: root, media_root: media_root)
       normalized2 = expand_wikilinks(normalized1, root: root)
       document = Markly.parse(normalized2, flags: Markly::SMART | Markly::UNSAFE | Markly::HARD_BREAKS, extensions: [:table, :tasklist, :autolink])
-      Obsidian::ParsedMarkdownDocument.new(document, renderer: renderer)
+      Obsidian::ParsedMarkdownDocument.new(document, renderer: renderer, frontmatter: frontmatter)
     end
+
+    private
+
+    attr_reader :renderer
+    attr_reader :frontmatter_parser
   end
 end

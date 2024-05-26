@@ -161,10 +161,14 @@ module Obsidian
       nil
     end
 
-    def generate_html(markdown_parser: MarkdownParser.new)
+    def parse(markdown_parser: MarkdownParser.new)
       return nil if content.nil?
 
-      markdown_parser.parse(content.call, root: root, media_root: media_root).to_html
+      markdown_parser.parse(content.call, root: root, media_root: media_root)
+    end
+
+    def generate_html(markdown_parser: MarkdownParser.new)
+      parse(markdown_parser: markdown_parser).to_html
     end
 
     def referenced?

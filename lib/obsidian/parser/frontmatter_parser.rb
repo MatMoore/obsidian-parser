@@ -8,19 +8,27 @@ class Obsidian::MarkdownParser::FrontMatterParser
   def parse(content)
     enumerator = content.each_line
     first_line = enumerator.next
+    complete = false
 
     if first_line.chomp != "---"
+      puts "bye"
       return {}
     end
 
     lines = []
     loop do
       line = enumerator.next
-      break if line.chomp == "---"
+      if line.chomp == "---"
+        complete = true
+        break
+      end
       lines << line
     end
 
-    YAML.safe_load(lines.join)
+    puts lines
+    puts complete
+
+    complete ? YAML.safe_load(lines.join) : {}
   rescue YAML::SyntaxError, StopIteration
     {}
   end

@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Obsidian::MarkdownParser do
-  describe ".expand_wikilinks" do
+  subject(:parser) { described_class.new }
+
+  describe "#expand_wikilinks" do
     let(:index) { Obsidian::Page.create_root }
-    subject(:parser) { described_class.new }
 
     before do
       index.add_page("foo/bar")
@@ -108,6 +109,25 @@ RSpec.describe Obsidian::MarkdownParser do
         result = parser.expand_attachments("![[banana|a yellow banana]]", root: index, media_root: media_root)
         expect(result).to eq("a yellow banana")
       end
+    end
+  end
+
+  describe "#parse" do
+    it "parses frontmatter if available" do
+      content = %(---
+        foo: 1
+        bar: banana
+---
+        some text
+      )
+      result = parser.parse(content)
+      expect(result.frontmatter).to eq("foo" => 1, "bar" => "banana")
+    end
+
+    it "returns empty frontmatter if not available" do
+      content = "some text"
+      result = parser.parse(content)
+      expect(result.frontmatter).to eq({})
     end
   end
 end
