@@ -29,18 +29,18 @@ module Obsidian
     end
 
     def find(&block)
-      walk_tree do |page|
+      walk do |page|
         return page if block.call(page)
       end
 
       nil
     end
 
-    def walk_tree(&block)
+    def walk(&block)
       block.call(self)
 
       children.each do |page|
-        page.walk_tree(&block)
+        page.walk(&block)
       end
     end
   end
