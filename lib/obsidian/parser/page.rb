@@ -2,8 +2,25 @@
 
 # TODO: remove this dependency
 require "tilt/erb"
+require_relative "tree"
 
 module Obsidian
+  # WIP
+  PageNode = Struct.new(
+    :title,
+    :slug,
+    :last_modified,
+    :source_path,
+    :content_type,
+    keyword_init: true
+  ) do
+    def raw_content
+    end
+
+    def html
+    end
+  end
+
   # A page in the vault corresponding to either a markdown document,
   # or a directory containing other documents.
   #
@@ -71,7 +88,7 @@ module Obsidian
     # Call this method on the root page.
     # When calling this method, you must ensure that anscestor pages
     # are added before their descendents.
-    def add_page(slug, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil)
+    def add_page(slug, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil, strip_numeric_prefix: true)
       path_components = slug.split("/")
 
       if path_components.empty?
@@ -80,10 +97,13 @@ module Obsidian
       end
 
       title = path_components.pop
+      if strip_numeric_prefix
+        title = title.sub(/^\d+ - /, "")
+      end
 
       parent = path_components.reduce(self) do |index, anscestor_title|
         anscestor_slug = Obsidian.build_slug(anscestor_title, index.slug)
-        index.get_or_create_child(slug: anscestor_slug, title: anscestor_title)
+        index.get_or_create_child(slug: anscestor_slug, title: anscestor_title.sub(/^\d+ - /, ""))
       end
 
       parent.get_or_create_child(
@@ -120,7 +140,7 @@ module Obsidian
     end
 
     def children
-      @children.values.sort_by { |c| [c.is_index? ? 0 : 1, c.title] }
+      @children.values.sort_by { |c| [c.is_index? ? 0 : 1, c.slug] }
     end
 
     def walk_tree(&block)
