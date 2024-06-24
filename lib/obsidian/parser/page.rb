@@ -133,7 +133,7 @@ module Obsidian
       path_components = slug.split("/")
 
       if path_components.empty?
-        update_content(content: content, last_modified: last_modified)
+        update_content(content: content, last_modified: last_modified, source_path: source_path)
         return
       end
 
@@ -156,7 +156,7 @@ module Obsidian
         media_root: media_root,
         source_path: source_path
       ).tap do |page|
-        page.update_content(content: content, last_modified: last_modified)
+        page.update_content(content: content, last_modified: last_modified, source_path: source_path)
       end
     end
 
@@ -177,11 +177,10 @@ module Obsidian
       @child_pages[slug] ||= page
     end
 
-    # TODO: for special handling of index.md files,
-    # we should update the source path
-    def update_content(content:, last_modified:)
+    def update_content(content:, last_modified:, source_path:)
       @content_store[slug] ||= content
       @tree.value.last_modified ||= last_modified
+      @tree.value.source_path ||= source_path
     end
 
     def children
