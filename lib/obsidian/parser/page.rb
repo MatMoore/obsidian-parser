@@ -14,12 +14,24 @@ module Obsidian
     :content_type,
     keyword_init: true
   ) do
-    def raw_content
+    def parse
     end
 
-    def html
+    def uri
+      if slug == ""
+        "/"
+      else
+        "/" + slug.split("/").map { |part| ERB::Util.url_encode(part) }.join("/")
+      end
     end
   end
+
+  ParsedPage = Struct.new(
+    :metadata,
+    :raw_content,
+    :html,
+    keyword_init: true
+  )
 
   # A page in the vault corresponding to either a markdown document,
   # or a directory containing other documents.
@@ -37,39 +49,44 @@ module Obsidian
   # encountering wikilink syntax.
   class Page
     def self.create_root
-      Page.new(title: "", slug: "")
+      legacy_initialize(title: "", slug: "")
     end
 
-    def initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil, media_root: nil, source_path: nil)
+    def self.legacy_initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil, media_root: nil, source_path: nil, content_store: {})
       # TODO: check frontmatter for titles as well
-      @title = title
-      @slug = slug
-      @last_modified = last_modified
+      node = PageNode.new(title: title, slug: slug, last_modified: last_modified, content_type: content_type, source_path: source_path)
+
+      # Migration step:
+      # - use tree to store metadata about the file
+      # - but use content_store to store the content callbacks
+      tree = Tree.new(node)
+      content_store[slug] = content unless content.nil?
+
+      Page.new(tree, content_store, parent: parent, media_root: media_root)
+    end
+
+    def initialize(tree, content_store, parent: nil, media_root: nil)
+      @tree = tree
+      @content_store = content_store
       @content = content
       @parent = parent
-      @root = parent.nil? ? self : parent.root
-      @children = {}
-      @content_type = content_type
       @media_root = media_root
-      @source_path = source_path
       @referenced = false
+      @child_pages = {}
     end
 
+    attr_reader :parent
+
     def is_index?
-      !children.empty?
+      !@tree.children.empty?
     end
 
     def inspect
-      "Page(title: #{title.inspect}, slug: #{slug.inspect})"
+      "Page(tree=#{@tree.inspect})"
     end
 
-    # Apply percent encoding to the slug
     def uri
-      if slug == ""
-        "/"
-      else
-        "/" + slug.split("/").map { |part| ERB::Util.url_encode(part) }.join("/")
-      end
+      @tree.value.uri
     end
 
     def ==(other)
@@ -82,6 +99,30 @@ module Obsidian
 
     def hash
       slug.hash
+    end
+
+    def slug
+      @tree.value.slug
+    end
+
+    def content
+      @content_store[slug]
+    end
+
+    def title
+      @tree.value.title
+    end
+
+    def content_type
+      @tree.value.content_type
+    end
+
+    def last_modified
+      @tree.value.last_modified
+    end
+
+    def source_path
+      @tree.value.source_path
     end
 
     # Add a note to the tree based on its slug.
@@ -122,25 +163,30 @@ module Obsidian
     def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil)
       # TODO: validate slug matches the current page slug
 
-      @children[title] ||= Page.new(
+      value = PageNode.new(
         slug: slug,
         title: title,
         last_modified: last_modified,
-        content: content,
         content_type: content_type,
-        parent: self,
-        media_root: media_root,
         source_path: source_path
       )
+
+      child = @tree.add_child_unless_exists(value)
+      @content_store[slug] = content unless content.nil?
+      page = Page.new(child, @content_store, parent: self, media_root: @media_root)
+      @child_pages[slug] ||= page
     end
 
+    # TODO: for special handling of index.md files,
+    # we should update the source path
     def update_content(content:, last_modified:)
-      @content ||= content
-      @last_modified ||= last_modified
+      @content_store[slug] ||= content
+      @tree.value.last_modified ||= last_modified
     end
 
     def children
-      @children.values.sort_by { |c| [c.is_index? ? 0 : 1, c.slug] }
+      nodes = @tree.children
+      nodes.map { |node| @child_pages[node.value.slug] }.sort_by { |c| [c.is_index? ? 0 : 1, c.slug] }
     end
 
     def walk_tree(&block)
@@ -188,7 +234,7 @@ module Obsidian
     end
 
     def generate_html(markdown_parser: MarkdownParser.new)
-      parse(markdown_parser: markdown_parser).to_html
+      parse(markdown_parser: markdown_parser)&.to_html
     end
 
     def referenced?
@@ -205,23 +251,12 @@ module Obsidian
     # Remove any child paths that are unreferenced,
     # i.e. not reachable through links
     def prune!
-      @children = @children.delete_if do |k, v|
-        !v.referenced?
-      end
-
-      @children.values.each do |page|
-        page.prune!
+      @tree.remove_all do |value|
+        !find_in_tree(value.slug).referenced?
       end
     end
 
-    attr_reader :title
-    attr_reader :slug
-    attr_reader :last_modified
-    attr_reader :content
-    attr_reader :content_type
-    attr_reader :parent
     attr_reader :root
     attr_reader :media_root
-    attr_reader :source_path
   end
 end

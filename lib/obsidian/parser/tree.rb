@@ -20,6 +20,20 @@ module Obsidian
       node
     end
 
+    def get_child(value)
+      children.find { |child| child.value == value }
+    end
+
+    def child_exists(value)
+      children.any? { |node| node.value == value }
+    end
+
+    def add_child_unless_exists(value)
+      child = get_child(value)
+      return child unless child.nil?
+      add_child(value)
+    end
+
     def remove_child(value)
       children.delete_if { |node| node.value == value }
     end
@@ -41,6 +55,16 @@ module Obsidian
 
       children.each do |page|
         page.walk(&block)
+      end
+    end
+
+    def remove_all(&block)
+      @children = @children.delete_if do |node|
+        block.call(node.value)
+      end
+
+      @children.each do |child|
+        child.remove_all(&block)
       end
     end
   end
