@@ -63,25 +63,21 @@ module Obsidian
       # TODO: check frontmatter for titles as well
       node = PageNode.new(title: title, slug: slug, last_modified: last_modified, content_type: content_type, source_path: source_path)
 
-      tree = Tree.new(node)
+      tree = Tree.new(node, order_by: @ordering)
 
       Page.new(tree, parent: parent, media_root: media_root)
     end
 
-    def initialize(tree, parent: nil, root: nil, media_root: nil)
+    def initialize(tree, parent: nil, root: nil, media_root: nil, referenced_slugs: {})
       @tree = tree
       @parent = parent
       @media_root = media_root
-      @referenced = false
-      @child_pages = {}
+      @referenced_slugs = referenced_slugs
       @root = root || self
+      @ordering = proc { |c| [c.children.empty? ? 0 : 1, c.value.slug] }
     end
 
     attr_reader :parent
-
-    def is_index?
-      @tree.is_index?
-    end
 
     def inspect
       "Page(tree=#{@tree.inspect})"
@@ -146,7 +142,11 @@ module Obsidian
 
       parent = path_components.reduce(self) do |index, anscestor_title|
         anscestor_slug = Obsidian.build_slug(anscestor_title, index.slug)
-        index.get_or_create_child(slug: anscestor_slug, title: anscestor_title.sub(/^\d+ - /, ""))
+        index.get_or_create_child(
+          slug: anscestor_slug,
+          title: anscestor_title.sub(/^\d+ - /, ""),
+          media_root: media_root
+        )
       end
 
       parent.get_or_create_child(
@@ -173,8 +173,7 @@ module Obsidian
       )
 
       child = @tree.add_child_unless_exists(value.slug, value)
-      page = Page.new(child, parent: self, root: root, media_root: media_root)
-      @child_pages[slug] ||= page
+      Page.new(child, parent: self, root: root, media_root: media_root, referenced_slugs: @referenced_slugs)
     end
 
     def update_source(last_modified:, source_path:)
@@ -182,18 +181,7 @@ module Obsidian
       @tree.value.source_path ||= source_path
     end
 
-    def children
-      nodes = @tree.children
-      nodes.map { |node| @child_pages[node.value.slug] }.sort_by { |c| [c.is_index? ? 0 : 1, c.slug] }
-    end
-
-    def walk_tree(&block)
-      block.call(self)
-
-      children.each do |page|
-        page.walk_tree(&block)
-      end
-    end
+    attr_reader :tree
 
     # Return the page that matches a slug.
     # If there is an exact match, we should always return that
@@ -201,9 +189,11 @@ module Obsidian
     # match, then return the first, shortest match.
     # If a query slug contains `/index` we ignore it and treat it
     # the same as `/`
-    def find_in_tree(query_slug)
+    def find_in_tree(query_slug, search_tree: @tree)
+      slug = search_tree.value.slug
+
       # Exact match
-      return self if slug == query_slug
+      return search_tree if slug == query_slug
 
       # Partial match
       query_parts = query_slug.split("/").reject { |part| part == "index" }
@@ -212,13 +202,13 @@ module Obsidian
 
       if slug_parts.length >= length
         if slug_parts.slice(-length, length) == query_parts
-          return self
+          return search_tree
         end
       end
 
       # Recurse
-      children.each do |child|
-        result = child.find_in_tree(query_slug)
+      search_tree.children.each do |child|
+        result = find_in_tree(query_slug, search_tree: child)
         return result unless result.nil?
       end
 
@@ -235,22 +225,24 @@ module Obsidian
       parse(markdown_parser: markdown_parser).html
     end
 
-    def referenced?
-      @referenced
-    end
-
     # Mark the tree containing this page as being "referenced"
     # i.e. reachable through links
     def mark_referenced
-      @referenced = true
-      parent&.mark_referenced
+      @referenced_slugs[tree.value.slug] = true
+      tree.anscestors.each do |a|
+        @referenced_slugs[a.value.slug] = true
+      end
+    end
+
+    def referenced?(slug)
+      @referenced_slugs[slug] == true
     end
 
     # Remove any child paths that are unreferenced,
     # i.e. not reachable through links
     def prune!
       @tree.remove_all do |value|
-        !find_in_tree(value.slug).referenced?
+        !@referenced_slugs[value.slug]
       end
     end
 

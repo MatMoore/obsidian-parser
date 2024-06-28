@@ -2,15 +2,28 @@
 
 module Obsidian
   class Tree
-    def initialize(value)
+    def initialize(value, parent: nil, order_by: nil)
       @value = value
       @children = {}
+      @parent = parent
+      @order_by = order_by
     end
 
     attr_reader :value
+    attr_reader :parent
 
     def children
-      @children.values
+      if @order_by
+        @children.values.sort_by(&@order_by)
+      else
+        @children.values
+      end
+    end
+
+    def anscestors
+      return [] if @parent.nil?
+
+      [parent] + parent.anscestors
     end
 
     def inspect
@@ -18,7 +31,7 @@ module Obsidian
     end
 
     def add_child(key, value)
-      node = Tree.new(value)
+      node = Tree.new(value, parent: self)
       @children[key] = node
     end
 

@@ -45,7 +45,7 @@ module Obsidian
     end
 
     def link_to_page(text:, target:, fragment:, root:)
-      page = root.find_in_tree(target)
+      page = root.find_in_tree(target)&.value
 
       if page.nil?
         text.nil? ? target.split("/").last : text
@@ -62,7 +62,7 @@ module Obsidian
         text = $~[:text]
         target = $~[:target]
         fragment = $~[:fragment]
-        attachment = media_root.find_in_tree(target)
+        attachment = media_root.find_in_tree(target)&.value
 
         if attachment.nil?
           # If we attach a page, it is supposed to be displayed inline.
