@@ -176,7 +176,7 @@ module Obsidian
         source_path: source_path
       )
 
-      child = @tree.add_child_unless_exists(value)
+      child = @tree.add_child_unless_exists(value.slug, value)
       @content_store[slug] = content unless content.nil?
       page = Page.new(child, @content_store, parent: self, root: root, media_root: media_root)
       @child_pages[slug] ||= page

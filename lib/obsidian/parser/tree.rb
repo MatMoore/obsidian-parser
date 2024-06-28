@@ -4,42 +4,44 @@ module Obsidian
   class Tree
     def initialize(value)
       @value = value
-      @children = []
+      @children = {}
     end
 
-    attr_reader :children
     attr_reader :value
+
+    def children
+      @children.values
+    end
 
     def inspect
       "Tree(#{value.inspect}) [#{children.length} children]"
     end
 
-    def add_child(value)
+    def add_child(key, value)
       node = Tree.new(value)
-      children << node
-      node
+      @children[key] = node
     end
 
-    def get_child(value)
-      children.find { |child| child.value == value }
+    def get_child(key)
+      @children[key]
     end
 
-    def child_exists(value)
-      children.any? { |node| node.value == value }
+    def child_exists(key)
+      @children.include?(key)
     end
 
-    def add_child_unless_exists(value)
-      child = get_child(value)
+    def add_child_unless_exists(key, value)
+      child = @children[key]
       return child unless child.nil?
-      add_child(value)
+      add_child(key, value)
     end
 
-    def remove_child(value)
-      children.delete_if { |node| node.value == value }
+    def remove_child(key)
+      @children.delete(key)
     end
 
     def is_index?
-      children.length > 0
+      @children.length > 0
     end
 
     def find(&block)
@@ -59,11 +61,11 @@ module Obsidian
     end
 
     def remove_all(&block)
-      @children = @children.delete_if do |node|
+      @children = @children.delete_if do |key, node|
         block.call(node.value)
       end
 
-      @children.each do |child|
+      children.each do |child|
         child.remove_all(&block)
       end
     end

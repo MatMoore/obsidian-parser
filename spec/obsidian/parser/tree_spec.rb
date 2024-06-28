@@ -5,9 +5,9 @@ RSpec.describe Obsidian::Tree do
 
   describe("creating, retrieving, and removing nodes") do
     before do
-      foo = root.add_child(:foo)
-      foo.add_child(:bar)
-      foo.add_child(:baz)
+      foo = root.add_child("a", :foo)
+      foo.add_child("a", :bar)
+      foo.add_child("b", :baz)
     end
 
     it "can find a node from the root" do
@@ -24,7 +24,7 @@ RSpec.describe Obsidian::Tree do
     end
 
     it "can remove nodes" do
-      root.remove_child(:foo)
+      root.remove_child("a")
       expect(root.children).to be_empty
     end
 
