@@ -42,13 +42,13 @@ module Obsidian
 
     def pages
       result = []
-      index.walk_tree { |page| result << page }
+      index.tree.walk { |page| result << page }
       result
     end
 
     def media
       result = []
-      media_index.walk_tree { |page| result << page }
+      media_index.tree.walk { |page| result << page }
       result
     end
 
