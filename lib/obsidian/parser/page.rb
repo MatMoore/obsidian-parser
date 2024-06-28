@@ -65,7 +65,7 @@ module Obsidian
       Page.new(tree, content_store, parent: parent, media_root: media_root)
     end
 
-    def initialize(tree, content_store, parent: nil, media_root: nil)
+    def initialize(tree, content_store, parent: nil, root: nil, media_root: nil)
       @tree = tree
       @content_store = content_store
       @content = content
@@ -73,6 +73,7 @@ module Obsidian
       @media_root = media_root
       @referenced = false
       @child_pages = {}
+      @root = root || self
     end
 
     attr_reader :parent
@@ -83,6 +84,10 @@ module Obsidian
 
     def inspect
       "Page(tree=#{@tree.inspect})"
+    end
+
+    def value
+      @tree.value
     end
 
     def uri
@@ -173,7 +178,7 @@ module Obsidian
 
       child = @tree.add_child_unless_exists(value)
       @content_store[slug] = content unless content.nil?
-      page = Page.new(child, @content_store, parent: self, media_root: @media_root)
+      page = Page.new(child, @content_store, parent: self, root: root, media_root: media_root)
       @child_pages[slug] ||= page
     end
 
