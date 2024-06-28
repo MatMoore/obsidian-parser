@@ -8,8 +8,6 @@ require_relative "parser/html_renderer"
 require_relative "parser/content_type"
 require_relative "parser/frontmatter_parser"
 
-require "forwardable"
-
 module Obsidian
   class Error < StandardError; end
 
@@ -40,8 +38,6 @@ module Obsidian
           add_media_file(basename: basename, parent_slug: parent_slug, last_modified: path.mtime, path: path)
         end
       end
-
-      # TODO: capture links between notes
     end
 
     def pages
@@ -69,8 +65,9 @@ module Obsidian
       @index.add_page(
         slug,
         last_modified: last_modified,
-        content: lambda { path.read },
-        media_root: @media_index
+        media_root: @media_index,
+        content_type: "text/markdown",
+        source_path: path
       )
     end
 

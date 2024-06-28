@@ -5,7 +5,6 @@ require "tilt/erb"
 require_relative "tree"
 
 module Obsidian
-  # WIP
   PageNode = Struct.new(
     :title,
     :slug,
@@ -14,7 +13,14 @@ module Obsidian
     :content_type,
     keyword_init: true
   ) do
-    def parse
+    # TODO: remove dependency on root and media root
+    # instead, MarkdownParser should be parsed a reference to the vault
+    def parse(root:, media_root:, markdown_parser: MarkdownParser.new)
+      return nil if source_path.nil?
+
+      content = source_path.read
+      parsed_doc = markdown_parser.parse(content, root: root, media_root: media_root)
+      ParsedPage.new(metadata: self, raw_content: content, html: parsed_doc.to_html, frontmatter: parsed_doc.frontmatter)
     end
 
     def uri
@@ -28,6 +34,7 @@ module Obsidian
 
   ParsedPage = Struct.new(
     :metadata,
+    :frontmatter,
     :raw_content,
     :html,
     keyword_init: true
@@ -52,23 +59,17 @@ module Obsidian
       legacy_initialize(title: "", slug: "")
     end
 
-    def self.legacy_initialize(title:, slug:, last_modified: nil, content: nil, parent: nil, content_type: nil, media_root: nil, source_path: nil, content_store: {})
+    def self.legacy_initialize(title:, slug:, last_modified: nil, parent: nil, content_type: nil, media_root: nil, source_path: nil)
       # TODO: check frontmatter for titles as well
       node = PageNode.new(title: title, slug: slug, last_modified: last_modified, content_type: content_type, source_path: source_path)
 
-      # Migration step:
-      # - use tree to store metadata about the file
-      # - but use content_store to store the content callbacks
       tree = Tree.new(node)
-      content_store[slug] = content unless content.nil?
 
-      Page.new(tree, content_store, parent: parent, media_root: media_root)
+      Page.new(tree, parent: parent, media_root: media_root)
     end
 
-    def initialize(tree, content_store, parent: nil, root: nil, media_root: nil)
+    def initialize(tree, parent: nil, root: nil, media_root: nil)
       @tree = tree
-      @content_store = content_store
-      @content = content
       @parent = parent
       @media_root = media_root
       @referenced = false
@@ -79,7 +80,7 @@ module Obsidian
     attr_reader :parent
 
     def is_index?
-      !@tree.children.empty?
+      @tree.is_index?
     end
 
     def inspect
@@ -110,10 +111,6 @@ module Obsidian
       @tree.value.slug
     end
 
-    def content
-      @content_store[slug]
-    end
-
     def title
       @tree.value.title
     end
@@ -134,11 +131,11 @@ module Obsidian
     # Call this method on the root page.
     # When calling this method, you must ensure that anscestor pages
     # are added before their descendents.
-    def add_page(slug, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil, strip_numeric_prefix: true)
+    def add_page(slug, last_modified: nil, content_type: nil, media_root: nil, source_path: nil, strip_numeric_prefix: true)
       path_components = slug.split("/")
 
       if path_components.empty?
-        update_content(content: content, last_modified: last_modified, source_path: source_path)
+        update_source(last_modified: last_modified, source_path: source_path)
         return
       end
 
@@ -156,16 +153,15 @@ module Obsidian
         title: title,
         slug: slug,
         last_modified: last_modified,
-        content: content,
         content_type: content_type,
         media_root: media_root,
         source_path: source_path
       ).tap do |page|
-        page.update_content(content: content, last_modified: last_modified, source_path: source_path)
+        page.update_source(last_modified: last_modified, source_path: source_path)
       end
     end
 
-    def get_or_create_child(title:, slug:, last_modified: nil, content: nil, content_type: nil, media_root: nil, source_path: nil)
+    def get_or_create_child(title:, slug:, last_modified: nil, content_type: nil, media_root: nil, source_path: nil)
       # TODO: validate slug matches the current page slug
 
       value = PageNode.new(
@@ -177,13 +173,11 @@ module Obsidian
       )
 
       child = @tree.add_child_unless_exists(value.slug, value)
-      @content_store[slug] = content unless content.nil?
-      page = Page.new(child, @content_store, parent: self, root: root, media_root: media_root)
+      page = Page.new(child, parent: self, root: root, media_root: media_root)
       @child_pages[slug] ||= page
     end
 
-    def update_content(content:, last_modified:, source_path:)
-      @content_store[slug] ||= content
+    def update_source(last_modified:, source_path:)
       @tree.value.last_modified ||= last_modified
       @tree.value.source_path ||= source_path
     end
@@ -231,14 +225,14 @@ module Obsidian
       nil
     end
 
+    # deprecated
     def parse(markdown_parser: MarkdownParser.new)
-      return nil if content.nil?
-
-      markdown_parser.parse(content.call, root: root, media_root: media_root)
+      @tree.value.parse(root: root, media_root: media_root, markdown_parser: markdown_parser)
     end
 
+    # deprecated
     def generate_html(markdown_parser: MarkdownParser.new)
-      parse(markdown_parser: markdown_parser)&.to_html
+      parse(markdown_parser: markdown_parser).html
     end
 
     def referenced?
