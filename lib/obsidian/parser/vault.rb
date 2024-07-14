@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: remove this dependency
-require "tilt/erb"
 require_relative "tree"
 require_relative "page"
 
@@ -21,7 +19,7 @@ module Obsidian
   # encountering wikilink syntax.
   class Vault
     def self.create_root
-      node = PageNode.new(title: "", slug: "", last_modified: nil, content_type: nil, source_path: nil)
+      node = Page.new(title: "", slug: "", last_modified: nil, content_type: nil, source_path: nil)
       tree = Tree.new(node, order_by: @ordering)
       Vault.new(tree)
     end
@@ -61,7 +59,7 @@ module Obsidian
       parent = path_components.reduce(@tree) do |subtree, anscestor_title|
         anscestor_slug = Obsidian.build_slug(anscestor_title, subtree.value.slug)
 
-        value = PageNode.new(
+        value = Page.new(
           slug: anscestor_slug,
           title: anscestor_title.sub(/^\d+ - /, ""),
           last_modified: last_modified,
@@ -73,7 +71,7 @@ module Obsidian
       end
 
       # Create the page
-      value = PageNode.new(
+      value = Page.new(
         slug: slug,
         title: title,
         last_modified: last_modified,

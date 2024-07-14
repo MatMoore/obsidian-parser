@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+# TODO: remove this dependency
+require "tilt/erb"
+
 module Obsidian
-  PageNode = Struct.new(
+  Page = Struct.new(
     :title,
     :slug,
     :last_modified,
@@ -10,7 +13,7 @@ module Obsidian
     keyword_init: true
   ) do
     # TODO: remove dependency on root and media root
-    # instead, MarkdownParser should be parsed a reference to the vault
+    # instead, MarkdownParser should be passed a reference to the vault
     def parse(root:, media_root:, markdown_parser: MarkdownParser.new)
       return nil if source_path.nil?
 

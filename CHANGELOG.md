@@ -1,11 +1,20 @@
 ## [Unreleased]
 
+### Added
+
 - Added support for wikilinks that embed files. These are rendered as images or links in the HTML content.
-- Added method `Page#generate_html` to replace `Page#content.generate_html`, and removed the `MarkdownDocument` class. `Page#content` is now a callable that returns the markdown content.
-- Added `Page#mark_referenced` and `Page#referenced?`
+
+### Removed
+
 - Added `Page#prune!` method to page objects, to remove non-referenced pages
-- Added `Page#parse` method to expose `ParsedMarkdownDocument` objects
 - Added `#frontmatter` to `ParsedMarkdownDocument`
+- Added `Vault#mark_referenced`, `Vault#referenced?`, `Vault#prune!`
+
+### Changed
+
+Big refactor of `Page` class. This is now split into `Page`, `ParsedPage`, `Vault`, `Tree`.
+
+`Vault` is now the main interface for adding and fetching pages.
 
 ## [0.7.0] - 2023-08-03
 
