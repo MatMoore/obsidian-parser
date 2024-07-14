@@ -74,7 +74,7 @@ module Obsidian
     end
 
     def remove_all(&block)
-      @children = @children.delete_if do |key, node|
+      @children.delete_if do |key, node|
         block.call(node.value)
       end
 

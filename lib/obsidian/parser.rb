@@ -3,7 +3,7 @@
 require_relative "parser/version"
 require_relative "parser/parsed_markdown_document"
 require_relative "parser/markdown_parser"
-require_relative "parser/page"
+require_relative "parser/vault"
 require_relative "parser/html_renderer"
 require_relative "parser/content_type"
 require_relative "parser/frontmatter_parser"
@@ -20,8 +20,8 @@ module Obsidian
     attr_reader :media_index
 
     def initialize(vault_directory)
-      @index = Obsidian::Page.create_root
-      @media_index = Obsidian::Page.create_root
+      @index = Obsidian::Vault.create_root
+      @media_index = Obsidian::Vault.create_root
       markdown_parser = MarkdownParser.new
 
       vault_directory.glob("**/*").each do |path|

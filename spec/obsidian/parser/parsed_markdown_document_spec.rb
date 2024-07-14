@@ -52,7 +52,7 @@ RSpec.describe Obsidian::ParsedMarkdownDocument do
   end
 
   context "with a document tree" do
-    let(:index) { Obsidian::Page.create_root }
+    let(:index) { Obsidian::Vault.create_root }
 
     before do
       index.add_page("foo/bar")

@@ -51,7 +51,7 @@ RSpec.describe Obsidian::Parser do
   end
 
   it "adds index.md content to the root" do
-    content = parser.index.generate_html
+    content = parser.index.tree.value.parse(root: parser.index, media_root: parser.media_index).html
 
     expect(content).to eq("<p>Blahhhh</p>\n")
   end

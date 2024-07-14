@@ -4,7 +4,7 @@ RSpec.describe Obsidian::MarkdownParser do
   subject(:parser) { described_class.new }
 
   describe "#expand_wikilinks" do
-    let(:index) { Obsidian::Page.create_root }
+    let(:index) { Obsidian::Vault.create_root }
 
     before do
       index.add_page("foo/bar")
@@ -64,7 +64,7 @@ RSpec.describe Obsidian::MarkdownParser do
     end
 
     context "with attachments" do
-      let(:media_root) { Obsidian::Page.create_root }
+      let(:media_root) { Obsidian::Vault.create_root }
 
       before do
         path = Pathname.new(__dir__).join("../../example_vault/foo/bar.jpg")
