@@ -9,7 +9,7 @@ module Obsidian
       @order_by = order_by
     end
 
-    attr_reader :value
+    attr_accessor :value
     attr_reader :parent
 
     def children
@@ -32,6 +32,10 @@ module Obsidian
 
     def add_child(key, value)
       node = Tree.new(value, parent: self)
+      add_child_node(key, node)
+    end
+
+    def add_child_node(key, node)
       @children[key] = node
     end
 

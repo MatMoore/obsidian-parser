@@ -3,6 +3,8 @@
 ### Added
 
 - Added support for wikilinks that embed files. These are rendered as images or links in the HTML content.
+- `Vault#mark_referenced` and `Vault#prune!` - ignore unwanted files
+- `Vault#collapse!` - if a subdirectory contains only one file, treat it as if the file were added to the parent
 
 ### Removed
 

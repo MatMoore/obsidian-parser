@@ -119,4 +119,31 @@ RSpec.describe Obsidian::Vault do
       expect(vault.find_in_tree("foo/baz")).to be_nil
     end
   end
+
+  describe("#collapse") do
+    it "preserves subtrees with more than one child" do
+      vault.add_page("foo/bar")
+      vault.add_page("foo/baz")
+      vault.add_page("foo/bar/a")
+      vault.add_page("foo/bar/b")
+
+      vault.collapse!
+
+      expect(vault.find_in_tree("foo/bar/a")).not_to be_nil
+      expect(vault.find_in_tree("foo/bar/b")).not_to be_nil
+      expect(vault.find_in_tree("foo/baz")).not_to be_nil
+    end
+
+    it "collapses subtrees with one child" do
+      vault.add_page("foo/bar")
+      vault.add_page("foo/baz")
+      vault.add_page("foo/bar/a")
+
+      vault.collapse!
+
+      expect(vault.find_in_tree("foo/baz")).not_to be_nil
+      expect(vault.find_in_tree("foo/bar/a")).to be_nil
+      expect(vault.find_in_tree("foo/a")).not_to be_nil
+    end
+  end
 end

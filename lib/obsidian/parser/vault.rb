@@ -145,7 +145,40 @@ module Obsidian
       end
     end
 
+    # Replace any single-child nodes with their child
+    def collapse!
+      collapse_tree!(@tree)
+    end
+
     attr_reader :root
     attr_reader :media_root
+
+    private
+
+    def collapse_tree!(tree)
+      if tree.children.size == 1 && !tree.parent.nil?
+        slug = tree.value.slug
+        child = tree.children.first
+        child_slug = child.value.slug
+        parent = tree.parent
+
+        parts = child_slug.split("/")
+        last_part = parts.pop
+        parts.pop
+        parts << last_part
+
+        new_child_slug = parts.join("/")
+        child.value.slug = new_child_slug
+
+        parent.add_child_node(new_child_slug, child)
+        parent.remove_child(slug)
+
+        collapse_tree!(child)
+      else
+        tree.children.each do |child|
+          collapse_tree!(child)
+        end
+      end
+    end
   end
 end
